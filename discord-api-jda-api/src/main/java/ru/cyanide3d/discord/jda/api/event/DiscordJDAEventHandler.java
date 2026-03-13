@@ -9,7 +9,7 @@ public interface DiscordJDAEventHandler<T extends EventContext<?>> {
     void onEvent(T event);
 
     default boolean supportEventContext(EventContext<?> event) {
-        return getEventClass().equals(event.getClass());
+        return getEventClass().isAssignableFrom(event.getClass());
     }
 
     default Class<?> getEventClass() {
