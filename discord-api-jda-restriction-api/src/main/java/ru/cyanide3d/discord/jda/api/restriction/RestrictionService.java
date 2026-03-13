@@ -1,9 +1,9 @@
 package ru.cyanide3d.discord.jda.api.restriction;
 
-import net.dv8tion.jda.api.events.GenericEvent;
+import ru.cyanide3d.discord.jda.api.contexts.EventContext;
 
 public interface RestrictionService {
 
-    RestrictionResult check(Restriction<?> restriction, GenericEvent event);
+    RestrictionResult check(Restriction<?> restriction, EventContext<?> eventContext);
 
 }

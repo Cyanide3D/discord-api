@@ -1,14 +1,14 @@
 package ru.cyanide3d.discord.jda.api.event;
 
-import net.dv8tion.jda.api.events.GenericEvent;
 import org.springframework.core.ResolvableType;
+import ru.cyanide3d.discord.jda.api.contexts.EventContext;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
 
-public interface DiscordJDAEventHandler<T extends GenericEvent> {
+public interface DiscordJDAEventHandler<T extends EventContext<?>> {
 
     void onEvent(T event);
 
-    default boolean supportEventType(Object event) {
+    default boolean supportEventContext(EventContext<?> event) {
         return getEventClass().equals(event.getClass());
     }
 

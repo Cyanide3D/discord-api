@@ -10,8 +10,10 @@ import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.cyanide3d.discord.jda.api.event.AbstractDiscordJDAEventListenerAdapter;
 import ru.cyanide3d.discord.jda.api.AutoEnabledEventListener;
+import ru.cyanide3d.discord.jda.api.contexts.EventContext;
+import ru.cyanide3d.discord.jda.api.contexts.EventContextFactory;
+import ru.cyanide3d.discord.jda.api.event.AbstractDiscordJDAEventListenerAdapter;
 import ru.cyanide3d.discord.jda.api.event.DiscordJDAEventHandler;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionResult;
@@ -28,28 +30,36 @@ public class GenericEventDiscordJDAEventListenerAdapter extends AbstractDiscordJ
     @Autowired
     private RestrictionService restrictionService;
 
+    @Autowired
+    private EventContextFactory eventContextFactory;
+
     @Override
     public void onGenericEvent(GenericEvent event) {
+        EventContext<?> eventContext = createEventContext(event);
         log.debug("Received GenericEvent: {}", event.getClass().getName());
         discordEventHandlers.stream()
-                .filter(handler -> handler.supportEventType(event))
+                .filter(handler -> handler.supportEventContext(eventContext))
                 .map(handler -> {
                     log.debug("Handling GenericEvent by handler: {}", handler.getClass().getName());
                     return handler;
                 })
-                .filter(handler -> enforceRestrictions(handler, event))
+                .filter(handler -> enforceRestrictions(handler, eventContext))
                 .forEach(handler -> {
                     try {
-                        handler.onEvent(cast(event));
+                        handler.onEvent(cast(eventContext));
                     } catch (Exception e) {
                         log.error("Failed to handle GenericEvent by handler: {}.", handler.getClass().getName(), e);
                     }
                 });
     }
 
-    protected boolean enforceRestrictions(DiscordJDAEventHandler<?> handler, GenericEvent event) {
+    protected EventContext<GenericEvent> createEventContext(GenericEvent event) {
+        return eventContextFactory.create(event);
+    }
+
+    protected boolean enforceRestrictions(DiscordJDAEventHandler<?> handler, EventContext<?> eventContext) {
         Restriction<?> restriction = handler.getRestriction();
-        RestrictionResult result = restrictionService.check(restriction, event);
+        RestrictionResult result = restrictionService.check(restriction, eventContext);
         return result.isAllowed();
     }
 
