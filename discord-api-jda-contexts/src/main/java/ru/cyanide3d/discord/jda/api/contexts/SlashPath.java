@@ -3,7 +3,6 @@ package ru.cyanide3d.discord.jda.api.contexts;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.springframework.util.StringUtils;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,7 +50,7 @@ public class SlashPath {
     @Override
     public String toString() {
         return Stream.of(command, group, subcommand)
-                .filter(StringUtils::hasText)
+                .filter(s -> s != null && !s.isBlank())
                 .collect(Collectors.joining(" "));
     }
 }

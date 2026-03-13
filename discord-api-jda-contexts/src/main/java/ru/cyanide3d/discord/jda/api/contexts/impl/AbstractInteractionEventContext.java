@@ -9,7 +9,7 @@ import ru.cyanide3d.discord.jda.api.contexts.InteractionEventContext;
 
 
 public abstract class AbstractInteractionEventContext<T extends GenericInteractionCreateEvent>
-        extends AbstractEventContext<T>
+        extends AbstractJDAEventContext<T>
         implements InteractionEventContext<T> {
 
     public AbstractInteractionEventContext(T event) {
