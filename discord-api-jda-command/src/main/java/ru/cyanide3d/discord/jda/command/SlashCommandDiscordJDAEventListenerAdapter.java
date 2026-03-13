@@ -88,7 +88,7 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
     }
 
     protected void handleCommandNotFound(@NotNull SlashCommandInteractionEvent event, SlashPath slashKey) {
-        queue(event.reply("Команда не поддерживается: " + slashKey.getCommand() + " " + slashKey.getSubcommand())
+        queue(event.reply("Команда не поддерживается: " + slashKey)
                 .setEphemeral(true), "handleCommandNotFound");
 
         log.debug("Trying to send command when command not found: {}", slashKey);

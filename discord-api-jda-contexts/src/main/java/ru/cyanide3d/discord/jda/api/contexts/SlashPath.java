@@ -2,11 +2,13 @@ package ru.cyanide3d.discord.jda.api.contexts;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.springframework.util.StringUtils;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
-@ToString
 @EqualsAndHashCode
 public class SlashPath {
 
@@ -46,4 +48,10 @@ public class SlashPath {
         return group != null;
     }
 
+    @Override
+    public String toString() {
+        return Stream.of(command, group, subcommand)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.joining(" "));
+    }
 }
