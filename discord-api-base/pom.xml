@@ -1,0 +1,120 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+<modelVersion>4.0.0</modelVersion>
+<artifactId>discord-api-base</artifactId>
+<packaging>pom</packaging>
+<version>1.0-SNAPSHOT</version>
+<name>Discord API - Base</name>
+
+<parent>
+    <groupId>ru.cyanide3d</groupId>
+    <artifactId>discord-api-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../discord-api-parent/pom.xml</relativePath>
+</parent>
+
+<properties>
+    <project.root>${basedir}/..</project.root>
+    <project.generated-test-resources>${project.build.directory}/generated-test-resources</project.generated-test-resources>
+    <dollar.sign>$</dollar.sign>
+
+    <skip.code.coverage>true</skip.code.coverage>
+    <checktyle.config>${project.root}/discord-api-base/src/main/resources/checkstyle-checker.xml</checktyle.config>
+
+    <!-- build settings -->
+    <resource.filtering>false</resource.filtering>
+
+    <jvm.memargs>-Xmx4g</jvm.memargs>
+
+    <spring.build.info.time>${project.build.outputTimestamp}</spring.build.info.time>
+    <maven.dependency.fail.on.warning>true</maven.dependency.fail.on.warning>
+</properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>ru.cyanide3d</groupId>
+                <artifactId>discord-api-bom</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+<dependencies>
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+    </dependency>
+</dependencies>
+
+<build>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <skip>${skip.checkstyle}</skip>
+                    <configLocation>${checktyle.config}</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <sourceDirectories>
+                        <directory>${project.build.sourceDirectory}</directory>
+                        <directory>${project.build.testSourceDirectory}</directory>
+                    </sourceDirectories>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>10.12.4</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+        </plugin>
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>check</id>
+                    <goals>
+                        <goal>analyze-only</goal>
+                    </goals>
+                    <phase>package</phase>
+                    <configuration>
+                        <failOnWarning>${maven.dependency.fail.on.warning}</failOnWarning>
+                        <ignoreNonCompile>true</ignoreNonCompile>
+                        <ignoreAllNonTestScoped>true</ignoreAllNonTestScoped>
+                        <ignoredDependencies>javax.annotation:javax.annotation-api</ignoredDependencies>
+                        <ignoredDependencies>org.apache.tomcat.embed:tomcat-embed-core</ignoredDependencies>
+                        <ignoredDependencies>org.springframework.boot:spring-boot-starter-validation</ignoredDependencies>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+
+</build>
+
+</project>

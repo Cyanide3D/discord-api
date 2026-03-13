@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ru.cyanide3d</groupId>
+    <artifactId>discord-api-jda-starter</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>Discord API - JDA Starter</name>
+
+    <parent>
+        <artifactId>discord-api-base</artifactId>
+        <groupId>ru.cyanide3d</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../discord-api-base/pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda-restriction</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-jvm</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda-command</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

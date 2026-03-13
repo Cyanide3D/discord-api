@@ -1,0 +1,75 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+        <modelVersion>4.0.0</modelVersion>
+        <artifactId>discord-api-bom</artifactId>
+        <packaging>pom</packaging>
+        <version>1.0-SNAPSHOT</version>
+        <name>Discord API - Bill Of Materials</name>
+
+        <parent>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <relativePath>../pom.xml</relativePath>
+        </parent>
+
+        <dependencyManagement>
+            <dependencies>
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda-api</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda-lavalink-plugin</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda-starter</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda-command-api</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda-command</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda-restriction</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ru.cyanide3d</groupId>
+                    <artifactId>discord-api-jda-restriction-api</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </dependencyManagement>
+
+        <build>
+            <plugins>
+
+            </plugins>
+        </build>
+
+    </project>
