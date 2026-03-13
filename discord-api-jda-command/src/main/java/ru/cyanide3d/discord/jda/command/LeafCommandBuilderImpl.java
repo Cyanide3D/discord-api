@@ -6,7 +6,7 @@ import ru.cyanide3d.discord.jda.api.command.OptionSpec;
 import ru.cyanide3d.discord.jda.api.command.SlashExecutor;
 import ru.cyanide3d.discord.jda.api.command.SubcommandSpec;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
-import ru.cyanide3d.discord.jda.api.restriction.contexts.SlashCommandContext;
+import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
 
 import java.util.ArrayList;
 import java.util.List;

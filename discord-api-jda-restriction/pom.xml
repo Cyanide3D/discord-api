@@ -48,6 +48,11 @@
 
         <dependency>
             <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda-contexts</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
             <artifactId>discord-api-jda-restriction-api</artifactId>
         </dependency>
     </dependencies>

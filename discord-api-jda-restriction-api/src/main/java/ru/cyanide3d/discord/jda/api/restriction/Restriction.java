@@ -1,8 +1,9 @@
 package ru.cyanide3d.discord.jda.api.restriction;
 
-import ru.cyanide3d.discord.jda.api.restriction.contexts.EventContext;
 
-public interface Restriction<C extends EventContext> {
+import ru.cyanide3d.discord.jda.api.contexts.EventContext;
+
+public interface Restriction<C extends EventContext<?>> {
 
     RestrictionResult check(C ctx);
 
@@ -37,7 +38,7 @@ public interface Restriction<C extends EventContext> {
         };
     }
 
-    static <C extends EventContext> Restriction<C> allow() {
+    static <C extends EventContext<?>> Restriction<C> allow() {
         return ctx -> RestrictionResult.allow();
     }
 

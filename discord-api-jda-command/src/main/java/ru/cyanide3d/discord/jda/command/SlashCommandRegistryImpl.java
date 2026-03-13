@@ -12,7 +12,7 @@ import ru.cyanide3d.discord.jda.api.command.SlashCommand;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandCompiler;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistry;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistryCustomizer;
-import ru.cyanide3d.discord.jda.api.command.SlashPath;
+import ru.cyanide3d.discord.jda.api.contexts.SlashPath;
 
 import java.util.ArrayList;
 import java.util.HashMap;

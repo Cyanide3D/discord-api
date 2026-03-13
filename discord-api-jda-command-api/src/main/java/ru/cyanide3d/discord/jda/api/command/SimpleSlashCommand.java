@@ -4,8 +4,9 @@ import lombok.Getter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import ru.cyanide3d.discord.jda.api.contexts.SlashPath;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
-import ru.cyanide3d.discord.jda.api.restriction.contexts.SlashCommandContext;
+import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
 
 import java.util.ArrayList;
 import java.util.Collections;

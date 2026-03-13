@@ -39,6 +39,7 @@
     <module>discord-api-jda</module>
     <module>discord-api-jda-restriction-api</module>
     <module>discord-api-jda-restriction</module>
+    <module>discord-api-jda-contexts</module>
 </modules>
 
 </project>

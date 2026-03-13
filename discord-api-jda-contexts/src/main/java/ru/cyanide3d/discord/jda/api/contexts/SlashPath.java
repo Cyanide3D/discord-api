@@ -1,4 +1,4 @@
-package ru.cyanide3d.discord.jda.api.command;
+package ru.cyanide3d.discord.jda.api.contexts;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

@@ -3,8 +3,8 @@ package ru.cyanide3d.discord.jda.restriction;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.GenericEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.cyanide3d.discord.jda.api.restriction.contexts.EventContext;
-import ru.cyanide3d.discord.jda.api.restriction.EventContextFactory;
+import ru.cyanide3d.discord.jda.api.contexts.EventContext;
+import ru.cyanide3d.discord.jda.api.contexts.EventContextFactory;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionEngine;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionResult;
@@ -29,7 +29,7 @@ public class RestrictionServiceImpl implements RestrictionService {
                 log.debug("Skipping restriction check for event {} because restriction is null", event.getClass().getSimpleName());
                 return RestrictionResult.allow();
             }
-            EventContext eventContext = eventContextFactory.create(event);
+            EventContext<?> eventContext = eventContextFactory.create(event);
             RestrictionResult result = restrictionEngine.check(restriction, cast(eventContext));
             log.debug("End of checking restriction for event {} result: {}", event.getClass().getSimpleName(), result);
             return result;

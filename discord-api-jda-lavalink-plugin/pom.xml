@@ -45,11 +45,6 @@
             <groupId>ru.cyanide3d</groupId>
             <artifactId>discord-api-jda-api</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>ru.cyanide3d</groupId>
-            <artifactId>discord-api-jda-command-api</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

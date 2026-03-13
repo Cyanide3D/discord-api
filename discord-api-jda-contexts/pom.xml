@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.cyanide3d</groupId>
-    <artifactId>discord-api-jda-command-api</artifactId>
+    <artifactId>discord-api-jda-contexts</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Discord API - JDA Command API</name>
+    <name>Discord API - JDA Contexts</name>
 
     <parent>
         <artifactId>discord-api-base</artifactId>
@@ -23,22 +23,12 @@
 
         <dependency>
             <groupId>ru.cyanide3d</groupId>
-            <artifactId>discord-api-jda-restriction-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.cyanide3d</groupId>
             <artifactId>cyanide3d-utils</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>ru.cyanide3d</groupId>
-            <artifactId>discord-api-jda-contexts</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
+            <artifactId>spring-context</artifactId>
         </dependency>
     </dependencies>
 

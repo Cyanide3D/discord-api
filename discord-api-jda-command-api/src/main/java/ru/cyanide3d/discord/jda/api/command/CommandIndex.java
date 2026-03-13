@@ -2,6 +2,7 @@ package ru.cyanide3d.discord.jda.api.command;
 
 import lombok.Getter;
 import org.springframework.lang.NonNull;
+import ru.cyanide3d.discord.jda.api.contexts.SlashPath;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
 
 import java.util.Collections;

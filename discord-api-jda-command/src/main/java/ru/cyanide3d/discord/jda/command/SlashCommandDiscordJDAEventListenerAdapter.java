@@ -12,7 +12,7 @@ import ru.cyanide3d.discord.jda.api.AutoEnabledEventListener;
 import ru.cyanide3d.discord.jda.api.command.ResolvedSlashLeaf;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistry;
 import ru.cyanide3d.discord.jda.api.command.SlashExecutor;
-import ru.cyanide3d.discord.jda.api.command.SlashPath;
+import ru.cyanide3d.discord.jda.api.contexts.SlashPath;
 import ru.cyanide3d.discord.jda.api.event.AbstractDiscordJDAEventListenerAdapter;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionResult;

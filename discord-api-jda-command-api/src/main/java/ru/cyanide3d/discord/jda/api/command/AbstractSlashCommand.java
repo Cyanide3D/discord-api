@@ -2,7 +2,7 @@ package ru.cyanide3d.discord.jda.api.command;
 
 import lombok.Getter;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
-import ru.cyanide3d.discord.jda.api.restriction.contexts.SlashCommandContext;
+import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
 
 @Getter
 public abstract class AbstractSlashCommand implements SlashCommand {
