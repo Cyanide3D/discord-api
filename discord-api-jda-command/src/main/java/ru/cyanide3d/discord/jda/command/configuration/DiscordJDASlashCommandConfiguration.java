@@ -1,5 +1,6 @@
 package ru.cyanide3d.discord.jda.command.configuration;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandCompiler;
@@ -19,6 +20,7 @@ public class DiscordJDASlashCommandConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public SlashCommandRegistry slashCommandRegistry() {
         return new SlashCommandRegistryImpl();
     }
@@ -34,6 +36,7 @@ public class DiscordJDASlashCommandConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public SlashCommandCompiler slashCommandCompiler() {
         return new SlashCommandCompilerImpl();
     }

@@ -2,6 +2,7 @@ package ru.cyanide3d.discord.jda.plugin.lavalink.autoconfiguration;
 
 import dev.arbjerg.lavalink.client.LavalinkClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import ru.cyanide3d.discord.jda.plugin.lavalink.DiscordJDALavalinkCustomizer;
@@ -24,6 +25,7 @@ public class DiscordJDALavalinkAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public LavalinkClientFactory lavalinkClientFactory() {
         return new LavalinkClientFactoryImpl();
     }
