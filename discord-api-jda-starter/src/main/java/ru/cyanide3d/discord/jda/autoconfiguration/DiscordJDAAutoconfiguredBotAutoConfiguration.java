@@ -12,6 +12,7 @@ import ru.cyanide3d.discord.jda.TrackingMemberCachePolicyImpl;
 import ru.cyanide3d.discord.jda.api.AutoConfiguredDiscordBot;
 import ru.cyanide3d.discord.jda.api.TrackingChunkingFilter;
 import ru.cyanide3d.discord.jda.api.TrackingMemberCachePolicy;
+import ru.cyanide3d.discord.jda.api.contexts.configuration.DiscordJDAContextsConfiguration;
 import ru.cyanide3d.discord.jda.api.properties.DiscordJDABotProperties;
 import ru.cyanide3d.discord.jda.command.configuration.DiscordJDASlashCommandConfiguration;
 import ru.cyanide3d.discord.jda.configuration.DiscordJDAEventHandlerConfiguration;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
 @Import({
         DiscordJDAEventHandlerConfiguration.class,
         DiscordJDASlashCommandConfiguration.class,
+        DiscordJDAContextsConfiguration.class
 })
 public class DiscordJDAAutoconfiguredBotAutoConfiguration {
 

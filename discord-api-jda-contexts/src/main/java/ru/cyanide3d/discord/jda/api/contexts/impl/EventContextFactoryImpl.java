@@ -53,7 +53,7 @@ public class EventContextFactoryImpl implements EventContextFactory {
             return cast(new DefaultButtonInteractionContext(e));
         }
 
-        log.info("context for event {} not supported. fallback to default event context", event.getClass().getName());
+        log.debug("context for event {} not supported. fallback to default event context", event.getClass().getName());
         return new DefaultJDAEventContext<>(event);
     }
 
