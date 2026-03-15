@@ -15,12 +15,12 @@ public class DefaultGuildMemberJoinContext
     }
 
     @Override
-    public Member getMember() {
+    public Member getMemberOrNull() {
         return getEvent().getMember();
     }
 
     @Override
-    public Guild getGuild() {
+    public Guild getGuildOrNull() {
         return getEvent().getGuild();
     }
 

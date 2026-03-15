@@ -14,8 +14,8 @@ public interface MessageReceivedContext
         MessageReactionCapability,
         TypingCapability {
 
-    boolean isFromGuild();
+    boolean isGuildMessage();
 
-    boolean isFromPrivate();
+    boolean isDirectMessage();
 
 }

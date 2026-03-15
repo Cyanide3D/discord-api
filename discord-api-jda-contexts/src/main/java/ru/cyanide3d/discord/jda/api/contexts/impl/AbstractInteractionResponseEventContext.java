@@ -19,32 +19,32 @@ public abstract class AbstractInteractionResponseEventContext<T extends GenericI
 
     @Override
     public void reply(String content) {
-        restActionExecutor.queue(getEvent().reply(content), getClass().getName());
+        restActionExecutor.queue(getEvent().reply(content), "interaction.reply");
     }
 
     @Override
     public void reply(MessageCreateData message) {
-        restActionExecutor.queue(getEvent().reply(message), getClass().getName());
+        restActionExecutor.queue(getEvent().reply(message), "interaction.reply");
     }
 
     @Override
     public void replyEphemeral(String content) {
-        restActionExecutor.queue(getEvent().reply(content).setEphemeral(true), getClass().getName());
+        restActionExecutor.queue(getEvent().reply(content).setEphemeral(true), "interaction.reply.ephemeral");
     }
 
     @Override
     public void replyEphemeral(MessageCreateData message) {
-        restActionExecutor.queue(getEvent().reply(message).setEphemeral(true), getClass().getName());
+        restActionExecutor.queue(getEvent().reply(message).setEphemeral(true), "interaction.reply.ephemeral");
     }
 
     @Override
     public void deferReply() {
-        restActionExecutor.queue(getEvent().deferReply(), getClass().getName());
+        restActionExecutor.queue(getEvent().deferReply(), "interaction.deferReply");
     }
 
     @Override
     public void deferReply(boolean ephemeral) {
-        restActionExecutor.queue(getEvent().deferReply(ephemeral), getClass().getName());
+        restActionExecutor.queue(getEvent().deferReply(ephemeral), "interaction.deferReply");
     }
 
     @Override

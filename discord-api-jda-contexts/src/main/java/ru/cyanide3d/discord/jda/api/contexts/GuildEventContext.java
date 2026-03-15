@@ -5,6 +5,18 @@ import net.dv8tion.jda.api.events.GenericEvent;
 
 public interface GuildEventContext<E extends GenericEvent> extends JDAEventContext<E> {
 
-    Guild getGuild();
+    Guild getGuildOrNull();
+
+    default boolean hasGuild() {
+        return getGuildOrNull() != null;
+    }
+
+    default Guild requireGuild() {
+        Guild guild = getGuildOrNull();
+        if (guild == null) {
+            throw new IllegalStateException("Event is not guild-scoped");
+        }
+        return guild;
+    }
 
 }

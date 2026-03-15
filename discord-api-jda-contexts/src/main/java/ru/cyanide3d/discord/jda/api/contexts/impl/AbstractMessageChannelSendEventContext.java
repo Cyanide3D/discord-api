@@ -20,17 +20,17 @@ public abstract class AbstractMessageChannelSendEventContext<T extends GenericEv
 
     @Override
     public void sendMessage(String content) {
-        restActionExecutor.queue(getMessageChannel().sendMessage(content), getClass().getName());
+        restActionExecutor.queue(getMessageChannel().sendMessage(content), "message.channel.send.message");
     }
 
     @Override
     public void sendMessage(MessageCreateData message) {
-        restActionExecutor.queue(getMessageChannel().sendMessage(message), getClass().getName());
+        restActionExecutor.queue(getMessageChannel().sendMessage(message), "message.channel.send.message");
     }
 
     @Override
     public void sendTyping() {
-        restActionExecutor.queue(getMessageChannel().sendTyping(), getClass().getName());
+        restActionExecutor.queue(getMessageChannel().sendTyping(), "message.channel.send.typing");
     }
 
     @Override

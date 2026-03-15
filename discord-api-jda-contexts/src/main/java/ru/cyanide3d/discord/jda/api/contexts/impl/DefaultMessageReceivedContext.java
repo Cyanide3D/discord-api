@@ -36,36 +36,36 @@ public class DefaultMessageReceivedContext
 
     @Override
     public void reply(String content) {
-        restActionExecutor.queue(getEvent().getMessage().reply(content), getClass().getName());
+        restActionExecutor.queue(getEvent().getMessage().reply(content), "message.reply");
     }
 
     @Override
     public void reply(MessageCreateData message) {
-        restActionExecutor.queue(getEvent().getMessage().reply(message), getClass().getName());
+        restActionExecutor.queue(getEvent().getMessage().reply(message), "message.reply");
     }
 
     @Override
     public void addReaction(Emoji emoji) {
-        restActionExecutor.queue(getEvent().getMessage().addReaction(emoji), getClass().getName());
+        restActionExecutor.queue(getEvent().getMessage().addReaction(emoji), "message.addReaction");
     }
 
     @Override
-    public boolean isFromGuild() {
+    public boolean isGuildMessage() {
         return getEvent().isFromGuild();
     }
 
     @Override
-    public boolean isFromPrivate() {
+    public boolean isDirectMessage() {
         return getEvent().isFromType(ChannelType.PRIVATE);
     }
 
     @Override
-    public Member getMember() {
+    public Member getMemberOrNull() {
         return getEvent().getMember();
     }
 
     @Override
-    public Guild getGuild() {
+    public Guild getGuildOrNull() {
         return getEvent().getGuild();
     }
 

@@ -58,7 +58,7 @@ public class EventContextFactoryImpl implements EventContextFactory {
             return cast(new DefaultGuildMemberRemoveContext(e));
         }
 
-        log.info("Context for event {} not supported, fallback to default jda event context", event.getClass().getName());
+        log.debug("Context for event {} not supported, fallback to default jda event context", event.getClass().getName());
         return cast(new DefaultJDAEventContext<>(event));
     }
 }

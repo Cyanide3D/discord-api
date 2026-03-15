@@ -22,12 +22,12 @@ public abstract class AbstractInteractionEventContext<T extends GenericInteracti
     }
 
     @Override
-    public Guild getGuild() {
+    public Guild getGuildOrNull() {
         return getEvent().getGuild();
     }
 
     @Override
-    public Member getMember() {
+    public Member getMemberOrNull() {
         return getEvent().getMember();
     }
 

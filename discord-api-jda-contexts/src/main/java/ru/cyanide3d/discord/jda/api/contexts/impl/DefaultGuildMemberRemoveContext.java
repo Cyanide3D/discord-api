@@ -14,7 +14,7 @@ public class DefaultGuildMemberRemoveContext
     }
 
     @Override
-    public Guild getGuild() {
+    public Guild getGuildOrNull() {
         return getEvent().getGuild();
     }
 
