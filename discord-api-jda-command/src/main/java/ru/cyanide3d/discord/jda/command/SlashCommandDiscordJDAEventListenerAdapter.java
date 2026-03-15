@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import ru.cyanide3d.discord.jda.api.AutoEnabledEventListener;
 import ru.cyanide3d.discord.jda.api.command.ResolvedSlashLeaf;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistry;
@@ -64,7 +65,10 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
     }
 
     protected void failedCheckRestrictionNotification(RestrictionResult restrictionResult, SlashCommandInteractionEvent event) {
-        queue(event.reply(restrictionResult.getReason()).setEphemeral(true)); //TODO
+        String reason = restrictionResult.getReason();
+        if (StringUtils.hasText(reason)) {
+            queue(event.reply(reason).setEphemeral(true));
+        }
     }
 
     protected RestrictionResult checkRestriction(Restriction<?> restriction, EventContext<?> eventContext) {

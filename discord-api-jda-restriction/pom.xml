@@ -37,6 +37,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>ru.cyanide3d</groupId>
             <artifactId>cyanide3d-utils</artifactId>
         </dependency>

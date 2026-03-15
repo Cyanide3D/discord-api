@@ -1,5 +1,6 @@
 package ru.cyanide3d.discord.jda.restriction;
 
+import org.springframework.util.StringUtils;
 import ru.cyanide3d.discord.jda.api.contexts.EventContext;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionEngine;
@@ -16,8 +17,16 @@ public class RestrictionEngineImpl implements RestrictionEngine {
     public <T extends EventContext<?>> void enforce(Restriction<T> restriction, T ctx) {
         RestrictionResult result = check(restriction, ctx);
         if (!result.isAllowed()) {
-            throw new IllegalStateException(result.getReason());
+            throw new IllegalStateException(getReason(result));
         }
+    }
+
+    private String getReason(RestrictionResult result) {
+        String reason = result.getReason();
+        if (StringUtils.hasText(reason)) {
+            return reason;
+        }
+        return "<unknown reason>";
     }
 
 }

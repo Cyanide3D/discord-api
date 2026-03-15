@@ -31,6 +31,10 @@ public interface Restriction<C extends EventContext<?>> {
         };
     }
 
+    default Restriction<C> not() {
+        return not(null);
+    }
+
     default Restriction<C> not(String reasonIfDenied) {
         return ctx -> {
             var r = this.check(ctx);

@@ -19,8 +19,8 @@ public interface DiscordJDAEventHandler<T extends EventContext<?>> {
                 .resolve();
     }
 
-    default Restriction<?> getRestriction() {
-        return null;
+    default Restriction<T> getRestriction() {
+        return Restriction.allow();
     }
 
 }

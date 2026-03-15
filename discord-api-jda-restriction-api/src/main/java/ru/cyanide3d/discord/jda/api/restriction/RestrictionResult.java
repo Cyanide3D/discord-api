@@ -22,6 +22,10 @@ public class RestrictionResult {
         return new RestrictionResult(true, null);
     }
 
+    public static RestrictionResult deny() {
+        return new RestrictionResult(false, null);
+    }
+
     public static RestrictionResult deny(String reason) {
         return new RestrictionResult(false, reason);
     }

@@ -28,8 +28,8 @@ public class RestrictionServiceImpl implements RestrictionService {
             log.debug("End of checking restriction for event {} result: {}", eventContext.getClass().getSimpleName(), result);
             return result;
         } catch (Exception e) {
-            log.error("Error while checking restrictions", e);
-            return RestrictionResult.deny("Error happened when checking restriction");
+            log.error("Error while checking restriction for event {}", eventContext.getClass().getSimpleName(), e);
+            return RestrictionResult.deny();
         }
     }
 
