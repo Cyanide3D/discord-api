@@ -4,8 +4,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionEngine;
+import ru.cyanide3d.discord.jda.api.restriction.RestrictionFailureNotifier;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionService;
 import ru.cyanide3d.discord.jda.restriction.RestrictionEngineImpl;
+import ru.cyanide3d.discord.jda.restriction.RestrictionFailureNotifierImpl;
 import ru.cyanide3d.discord.jda.restriction.RestrictionServiceImpl;
 
 @Configuration
@@ -21,6 +23,12 @@ public class DiscordJDARestrictionConfiguration {
     @ConditionalOnMissingBean
     public RestrictionService restrictionService() {
         return new RestrictionServiceImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RestrictionFailureNotifier restrictionFailureNotifier() {
+        return new RestrictionFailureNotifierImpl();
     }
 
 

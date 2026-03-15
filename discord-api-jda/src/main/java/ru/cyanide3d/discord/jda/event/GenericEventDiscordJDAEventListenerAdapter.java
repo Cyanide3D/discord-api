@@ -16,6 +16,7 @@ import ru.cyanide3d.discord.jda.api.contexts.EventContextFactory;
 import ru.cyanide3d.discord.jda.api.event.AbstractDiscordJDAEventListenerAdapter;
 import ru.cyanide3d.discord.jda.api.event.DiscordJDAEventHandler;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
+import ru.cyanide3d.discord.jda.api.restriction.RestrictionFailureNotifier;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionResult;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionService;
 
@@ -33,6 +34,9 @@ public class GenericEventDiscordJDAEventListenerAdapter extends AbstractDiscordJ
     @Autowired
     private EventContextFactory eventContextFactory;
 
+    @Autowired
+    private RestrictionFailureNotifier restrictionFailureNotifier;
+
     @Override
     public void onGenericEvent(GenericEvent event) {
         EventContext<?> eventContext = createEventContext(event);
@@ -43,7 +47,14 @@ public class GenericEventDiscordJDAEventListenerAdapter extends AbstractDiscordJ
                     log.debug("Handling GenericEvent by handler: {}", handler.getClass().getName());
                     return handler;
                 })
-                .filter(handler -> enforceRestrictions(handler, eventContext))
+                .filter(handler -> {
+                    RestrictionResult result = enforceRestrictions(handler, eventContext);
+                    if (result.isAllowed()) {
+                        return true;
+                    }
+                    failedCheckRestrictionNotification(result, eventContext);
+                    return false;
+                })
                 .forEach(handler -> {
                     try {
                         handler.onEvent(cast(eventContext));
@@ -53,14 +64,17 @@ public class GenericEventDiscordJDAEventListenerAdapter extends AbstractDiscordJ
                 });
     }
 
+    protected void failedCheckRestrictionNotification(RestrictionResult restrictionResult, EventContext<?> eventContext) {
+        restrictionFailureNotifier.notify(restrictionResult, eventContext);
+    }
+
     protected EventContext<GenericEvent> createEventContext(GenericEvent event) {
         return eventContextFactory.create(event);
     }
 
-    protected boolean enforceRestrictions(DiscordJDAEventHandler<?> handler, EventContext<?> eventContext) {
+    protected RestrictionResult enforceRestrictions(DiscordJDAEventHandler<?> handler, EventContext<?> eventContext) {
         Restriction<?> restriction = handler.getRestriction();
-        RestrictionResult result = restrictionService.check(restriction, eventContext);
-        return result.isAllowed();
+        return restrictionService.check(restriction, eventContext);
     }
 
     @Override

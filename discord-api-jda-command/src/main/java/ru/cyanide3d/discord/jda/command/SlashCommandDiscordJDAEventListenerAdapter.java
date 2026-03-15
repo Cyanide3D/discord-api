@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import ru.cyanide3d.discord.jda.api.AutoEnabledEventListener;
 import ru.cyanide3d.discord.jda.api.command.ResolvedSlashLeaf;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistry;
@@ -17,6 +16,7 @@ import ru.cyanide3d.discord.jda.api.contexts.EventContextFactory;
 import ru.cyanide3d.discord.jda.api.contexts.SlashPath;
 import ru.cyanide3d.discord.jda.api.event.AbstractDiscordJDAEventListenerAdapter;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
+import ru.cyanide3d.discord.jda.api.restriction.RestrictionFailureNotifier;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionResult;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionService;
 
@@ -37,6 +37,9 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
     @Autowired
     private EventContextFactory eventContextFactory;
 
+    @Autowired
+    private RestrictionFailureNotifier restrictionFailureNotifier;
+
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         SlashPath slashPath = SlashPath.fromEvent(event);
@@ -56,7 +59,7 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
         if (restrictionResult.isAllowed()) {
             runCommand(event, eventContext, leaf.getExecutor());
         } else {
-            failedCheckRestrictionNotification(restrictionResult, event);
+            failedCheckRestrictionNotification(restrictionResult, eventContext);
         }
     }
 
@@ -64,11 +67,8 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
         return eventContextFactory.create(event);
     }
 
-    protected void failedCheckRestrictionNotification(RestrictionResult restrictionResult, SlashCommandInteractionEvent event) {
-        String reason = restrictionResult.getReason();
-        if (StringUtils.hasText(reason)) {
-            queue(event.reply(reason).setEphemeral(true));
-        }
+    protected void failedCheckRestrictionNotification(RestrictionResult restrictionResult, EventContext<?> eventContext) {
+        restrictionFailureNotifier.notify(restrictionResult, eventContext);
     }
 
     protected RestrictionResult checkRestriction(Restriction<?> restriction, EventContext<?> eventContext) {

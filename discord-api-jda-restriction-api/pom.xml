@@ -20,6 +20,16 @@
             <groupId>ru.cyanide3d</groupId>
             <artifactId>discord-api-jda-contexts</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>cyanide3d-utils</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
