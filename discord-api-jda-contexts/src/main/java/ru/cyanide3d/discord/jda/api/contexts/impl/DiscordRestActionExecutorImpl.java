@@ -1,9 +1,9 @@
-package ru.cyanide3d.discord.jda;
+package ru.cyanide3d.discord.jda.api.contexts.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.RestAction;
-import ru.cyanide3d.discord.jda.api.DiscordRestActionExecutor;
+import ru.cyanide3d.discord.jda.api.contexts.DiscordRestActionExecutor;
 
 import java.util.function.Consumer;
 

@@ -2,7 +2,7 @@ package ru.cyanide3d.discord.jda.api.event;
 
 import net.dv8tion.jda.api.requests.RestAction;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.cyanide3d.discord.jda.api.DiscordRestActionExecutor;
+import ru.cyanide3d.discord.jda.api.contexts.DiscordRestActionExecutor;
 
 import java.util.function.Consumer;
 

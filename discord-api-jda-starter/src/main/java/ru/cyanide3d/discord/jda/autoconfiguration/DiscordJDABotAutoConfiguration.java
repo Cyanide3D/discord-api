@@ -19,7 +19,6 @@ import ru.cyanide3d.discord.jda.api.TrackingChunkingFilter;
 import ru.cyanide3d.discord.jda.api.TrackingMemberCachePolicy;
 import ru.cyanide3d.discord.jda.api.properties.DiscordJDABotProperties;
 import ru.cyanide3d.discord.jda.api.properties.DiscordJDAPresenceProperties;
-import ru.cyanide3d.discord.jda.configuration.DiscordJDAConfiguration;
 import ru.cyanide3d.discord.jda.event.DiscordJDAEventManager;
 import ru.cyanide3d.discord.jda.restriction.configuration.DiscordJDARestrictionConfiguration;
 
@@ -29,8 +28,7 @@ import java.util.concurrent.ExecutorService;
 @AutoConfiguration
 @ConditionalOnProperty(value = "discord.jda.enabled", havingValue = "true", matchIfMissing = true)
 @Import({
-        DiscordJDARestrictionConfiguration.class,
-        DiscordJDAConfiguration.class
+        DiscordJDARestrictionConfiguration.class
 })
 @Slf4j
 public class DiscordJDABotAutoConfiguration {

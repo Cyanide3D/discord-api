@@ -6,14 +6,15 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
+import ru.cyanide3d.discord.jda.api.contexts.DiscordRestActionExecutor;
 import ru.cyanide3d.discord.jda.api.contexts.MessageReactionContext;
 
 public abstract class AbstractMessageReactionContext<T extends GenericMessageReactionEvent>
-        extends AbstractJDAEventContext<T>
+        extends AbstractMessageChannelSendEventContext<T>
         implements MessageReactionContext<T> {
 
-    public AbstractMessageReactionContext(T event) {
-        super(event);
+    protected AbstractMessageReactionContext(T event, DiscordRestActionExecutor restActionExecutor) {
+        super(event, restActionExecutor);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.cyanide3d.discord.jda.api;
+package ru.cyanide3d.discord.jda.api.contexts;
 
 import net.dv8tion.jda.api.requests.RestAction;
 
