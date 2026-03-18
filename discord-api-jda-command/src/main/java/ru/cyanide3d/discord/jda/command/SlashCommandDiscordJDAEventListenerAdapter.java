@@ -13,6 +13,7 @@ import ru.cyanide3d.discord.jda.api.command.SlashCommandContextFactory;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistry;
 import ru.cyanide3d.discord.jda.api.command.SlashExecutor;
 import ru.cyanide3d.discord.jda.api.contexts.EventContext;
+import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
 import ru.cyanide3d.discord.jda.api.contexts.SlashPath;
 import ru.cyanide3d.discord.jda.api.event.AbstractDiscordJDAEventListenerAdapter;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
@@ -54,7 +55,7 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
         }
 
         ResolvedSlashLeaf leaf = leafOpt.get();
-        EventContext<?> eventContext = createEventContext(event, leaf);
+        SlashCommandContext eventContext = createEventContext(event, leaf);
         RestrictionResult restrictionResult = checkRestriction(leaf.getRestriction(), eventContext);
         if (restrictionResult.isAllowed()) {
             runCommand(event, eventContext, leaf.getExecutor());
@@ -63,7 +64,7 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
         }
     }
 
-    protected EventContext<SlashCommandInteractionEvent> createEventContext(@NotNull SlashCommandInteractionEvent event, @NotNull ResolvedSlashLeaf leaf) {
+    protected SlashCommandContext createEventContext(@NotNull SlashCommandInteractionEvent event, @NotNull ResolvedSlashLeaf leaf) {
         return contextFactory.create(event, leaf);
     }
 

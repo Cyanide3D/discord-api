@@ -15,10 +15,7 @@ public class DefaultSlashCommandOptions implements SlashCommandOptions {
 
     private final SlashCommandInteractionEvent event;
 
-    public DefaultSlashCommandOptions(
-            Iterable<? extends SlashOptionReader<?>> declaredOptions,
-            SlashCommandInteractionEvent event
-    ) {
+    public DefaultSlashCommandOptions(Iterable<? extends SlashOptionReader<?>> declaredOptions, SlashCommandInteractionEvent event) {
         this.event = event;
         this.declared = new LinkedHashMap<>();
         for (SlashOptionReader<?> option : declaredOptions) {

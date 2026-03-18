@@ -15,7 +15,17 @@ public interface InteractionResponseCapability {
 
     void deferReply();
 
-    void deferReply(boolean ephemeral);
+    void deferReplyEphemeral();
+
+    boolean isAcknowledged();
+
+    void followup(String content);
+
+    void followup(MessageCreateData content);
+
+    void followupEphemeral(MessageCreateData content);
+
+    void followupEphemeral(String content);
 
     IReplyCallback getReplyCallback();
 

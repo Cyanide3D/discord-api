@@ -1,10 +1,10 @@
 package ru.cyanide3d.discord.jda.api.command;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ru.cyanide3d.discord.jda.api.contexts.EventContext;
+import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
 
 public interface SlashCommandContextFactory {
 
-    EventContext<SlashCommandInteractionEvent> create(SlashCommandInteractionEvent event, ResolvedSlashLeaf leaf);
+    SlashCommandContext create(SlashCommandInteractionEvent event, ResolvedSlashLeaf leaf);
 
 }

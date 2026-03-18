@@ -1,23 +1,33 @@
 package ru.cyanide3d.discord.jda.api.command;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.With;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ru.cyanide3d.discord.jda.api.contexts.SlashOptionReader;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 @Getter
-@With
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class OptionSpec<T> implements SlashOptionReader<T> {
+public final class OptionSpec<T> implements SlashOptionReader<T> {
+
+    private static final int MAX_CHOICES = 25;
+
+    private static final Set<OptionType> CHOICE_CAPABLE_TYPES = Set.of(
+            OptionType.STRING,
+            OptionType.INTEGER,
+            OptionType.NUMBER
+    );
+
+    private static final Set<OptionType> AUTOCOMPLETE_CAPABLE_TYPES = Set.of(
+            OptionType.STRING,
+            OptionType.INTEGER,
+            OptionType.NUMBER
+    );
 
     private final OptionType type;
 
@@ -33,8 +43,23 @@ public class OptionSpec<T> implements SlashOptionReader<T> {
 
     private final Function<OptionMapping, T> reader;
 
+    private OptionSpec(OptionType type, String name, String description, boolean required, boolean autoComplete, List<ChoiceSpec> choices, Function<OptionMapping, T> reader) {
+        this.type = Objects.requireNonNull(type, "type");
+        this.name = Objects.requireNonNull(name, "name");
+        this.description = Objects.requireNonNull(description, "description");
+        this.required = required;
+        this.autoComplete = autoComplete;
+        this.choices = List.copyOf(Objects.requireNonNull(choices, "choices"));
+        this.reader = Objects.requireNonNull(reader, "reader");
+    }
+
     public static <T> OptionSpec<T> of(OptionType type, String name, String description, Function<OptionMapping, T> reader) {
-        return new OptionSpec<>(type, name, description, false, false, new ArrayList<>(), reader);
+        return new OptionSpec<>(type, name, description,
+                false,
+                false,
+                List.of(),
+                reader
+        );
     }
 
     public static OptionSpec<String> string(String name, String description) {
@@ -58,49 +83,89 @@ public class OptionSpec<T> implements SlashOptionReader<T> {
     }
 
     public OptionSpec<T> required() {
-        return withRequired(true);
+        return new OptionSpec<>(type, name, description, true, autoComplete, choices, reader);
     }
 
     public OptionSpec<T> optional() {
-        return withRequired(false);
+        return new OptionSpec<>(type, name, description, false, autoComplete, choices, reader);
     }
 
     public OptionSpec<T> autoComplete() {
-        return withAutoComplete(true);
+        return new OptionSpec<>(type, name, description, required, true, choices, reader);
     }
 
-    public OptionSpec<T> choice(String name, String value) {
+    public OptionSpec<T> choice(String choiceName, String value) {
         List<ChoiceSpec> copy = new ArrayList<>(choices);
-        copy.add(ChoiceSpec.of(name, value));
-        return withChoices(copy);
+        copy.add(ChoiceSpec.of(choiceName, value));
+
+        return new OptionSpec<>(type, name, description, required, autoComplete, copy, reader);
     }
 
-    public OptionSpec<T> choice(String name, long value) {
+    public OptionSpec<T> choice(String choiceName, long value) {
         List<ChoiceSpec> copy = new ArrayList<>(choices);
-        copy.add(ChoiceSpec.of(name, value));
-        return withChoices(copy);
+        copy.add(ChoiceSpec.of(choiceName, value));
+
+        return new OptionSpec<>(type, name, description, required, autoComplete, copy, reader);
     }
 
-    public OptionSpec<T> choice(String name, double value) {
+    public OptionSpec<T> choice(String choiceName, double value) {
         List<ChoiceSpec> copy = new ArrayList<>(choices);
-        copy.add(ChoiceSpec.of(name, value));
-        return withChoices(copy);
-    }
+        copy.add(ChoiceSpec.of(choiceName, value));
 
-    public List<ChoiceSpec> getChoices() {
-        return Collections.unmodifiableList(choices);
-    }
-
-    public OptionData toOptionData() {
-        OptionData data = new OptionData(type, name, description, required, autoComplete);
-        for (ChoiceSpec choice : choices) {
-            choice.apply(data);
-        }
-        return data;
+        return new OptionSpec<>(type, name, description, required, autoComplete, copy, reader);
     }
 
     @Override
     public T read(OptionMapping mapping) {
         return reader.apply(mapping);
+    }
+
+    public OptionData toOptionData() {
+        validateSpec();
+
+        OptionData data = new OptionData(type, name, description, required, autoComplete);
+
+        for (int i = 0; i < choices.size(); i++) {
+            ChoiceSpec choice = choices.get(i);
+            choice.validateFor(type, name, i);
+            choice.apply(data);
+        }
+
+        return data;
+    }
+
+    private void validateSpec() {
+        requireNonBlank(name, "name");
+        requireNonBlank(description, "description");
+
+        if (autoComplete && !AUTOCOMPLETE_CAPABLE_TYPES.contains(type)) {
+            throw new IllegalStateException(
+                    "Auto-complete is not supported for option type " + type + " (" + name + ")"
+            );
+        }
+
+        if (!choices.isEmpty() && !CHOICE_CAPABLE_TYPES.contains(type)) {
+            throw new IllegalStateException(
+                    "Predefined choices are not supported for option type " + type + " (" + name + ")"
+            );
+        }
+
+        if (choices.size() > MAX_CHOICES) {
+            throw new IllegalStateException(
+                    "Option '" + name + "' has " + choices.size() + " choices, but maximum is " + MAX_CHOICES
+            );
+        }
+
+        if (autoComplete && !choices.isEmpty()) {
+            throw new IllegalStateException(
+                    "Option '" + name + "' cannot use both predefined choices and auto-complete"
+            );
+        }
+    }
+
+    private static void requireNonBlank(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("OptionSpec." + field + " must not be blank");
+        }
     }
 }
