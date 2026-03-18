@@ -2,10 +2,12 @@ package ru.cyanide3d.discord.jda.plugin.lavalink.property;
 
 import dev.arbjerg.lavalink.client.NodeOptions;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.net.URI;
 
 @Getter
+@Setter
 public class LavalinkNode {
 
     private String name;

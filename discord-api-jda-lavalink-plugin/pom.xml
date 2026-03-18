@@ -27,6 +27,11 @@
         </dependency>
 
         <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda-contexts</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
@@ -49,6 +54,27 @@
         <dependency>
             <groupId>ru.cyanide3d</groupId>
             <artifactId>discord-api-jda-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda-command-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.cyanide3d</groupId>
+            <artifactId>discord-api-jda-command</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.arbjerg.lavalink</groupId>
+            <artifactId>protocol-jvm</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
         </dependency>
     </dependencies>
 

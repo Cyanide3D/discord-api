@@ -9,6 +9,8 @@ import ru.cyanide3d.discord.jda.api.properties.DiscordJDABotProperties;
 import ru.cyanide3d.discord.jda.plugin.lavalink.property.DiscordJDALavalinkProperties;
 import ru.cyanide3d.discord.jda.plugin.lavalink.property.LavalinkNode;
 
+import java.util.List;
+
 public class LavalinkClientFactoryImpl implements LavalinkClientFactory {
 
     @Autowired
@@ -27,7 +29,13 @@ public class LavalinkClientFactoryImpl implements LavalinkClientFactory {
         ILoadBalancer loadBalancer = client.getLoadBalancer();
         loadBalancer.addPenaltyProvider(new VoiceRegionPenaltyProvider());
 
-        lavalinkProperties.getNodes().stream()
+        List<LavalinkNode> nodes = lavalinkProperties.getNodes();
+
+        if (nodes == null || nodes.isEmpty()) {
+            throw new IllegalStateException("At least one lavalink node is required");
+        }
+
+        nodes.stream()
                         .map(LavalinkNode::buildNodeOptions)
                                 .forEach(client::addNode);
 
