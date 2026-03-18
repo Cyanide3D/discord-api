@@ -7,7 +7,7 @@ public interface LeafCommandBuilder<T> {
 
     LeafCommandBuilder<T> restrict(Restriction<SlashCommandContext> restriction);
 
-    LeafCommandBuilder<T> option(OptionSpec option);
+    LeafCommandBuilder<T> option(OptionSpec<?> option);
 
     LeafCommandBuilder<T> onExecute(SlashExecutor executor);
 

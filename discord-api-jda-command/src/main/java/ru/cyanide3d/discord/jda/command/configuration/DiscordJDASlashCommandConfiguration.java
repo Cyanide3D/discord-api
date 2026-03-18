@@ -4,9 +4,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandCompiler;
+import ru.cyanide3d.discord.jda.api.command.SlashCommandContextFactory;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistry;
 import ru.cyanide3d.discord.jda.command.InstanceSlashExecutorResolver;
 import ru.cyanide3d.discord.jda.command.SlashCommandCompilerImpl;
+import ru.cyanide3d.discord.jda.command.SlashCommandContextFactoryImpl;
 import ru.cyanide3d.discord.jda.command.SlashCommandDiscordJDAEventListenerAdapter;
 import ru.cyanide3d.discord.jda.command.SlashCommandRegistryImpl;
 import ru.cyanide3d.discord.jda.command.SpringSlashExecutorResolver;
@@ -33,6 +35,11 @@ public class DiscordJDASlashCommandConfiguration {
     @Bean
     public InstanceSlashExecutorResolver<?> instanceSlashExecutorResolver() {
         return new InstanceSlashExecutorResolver<>();
+    }
+
+    @Bean
+    public SlashCommandContextFactory slashCommandContextFactory() {
+        return new SlashCommandContextFactoryImpl();
     }
 
     @Bean

@@ -7,7 +7,7 @@ public interface SimpleCommandBuilder {
 
     SimpleCommandBuilder restrict(Restriction<SlashCommandContext> restriction);
 
-    SimpleCommandBuilder option(OptionSpec option);
+    SimpleCommandBuilder option(OptionSpec<?> option);
 
     SimpleCommandBuilder onExecute(SlashExecutor executor);
 

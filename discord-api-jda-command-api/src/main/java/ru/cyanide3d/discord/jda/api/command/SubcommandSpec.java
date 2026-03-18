@@ -16,13 +16,13 @@ public class SubcommandSpec {
 
      private final String description;
 
-     private final List<OptionSpec> options;
+     private final List<OptionSpec<?>> options;
 
      private final Restriction<SlashCommandContext> restriction;
 
      private final ExecutorSpec executorSpec;
 
-     public SubcommandSpec(String name, String description, List<OptionSpec> options, Restriction<SlashCommandContext> restriction, ExecutorSpec executorSpec) {
+     public SubcommandSpec(String name, String description, List<OptionSpec<?>> options, Restriction<SlashCommandContext> restriction, ExecutorSpec executorSpec) {
          this.name = name;
          this.description = description;
          this.options = new ArrayList<>(options);
@@ -30,13 +30,13 @@ public class SubcommandSpec {
          this.executorSpec = executorSpec;
      }
 
-     public List<OptionSpec> getOptions() {
+     public List<OptionSpec<?>> getOptions() {
          return Collections.unmodifiableList(options);
      }
 
      public SubcommandData toSubcommandData() {
          SubcommandData data = new SubcommandData(name, description);
-         for (OptionSpec option : options) {
+         for (OptionSpec<?> option : options) {
              data.addOptions(option.toOptionData());
          }
          return data;

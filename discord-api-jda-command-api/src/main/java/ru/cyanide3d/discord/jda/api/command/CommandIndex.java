@@ -2,11 +2,14 @@ package ru.cyanide3d.discord.jda.api.command;
 
 import lombok.Getter;
 import org.springframework.lang.NonNull;
+import ru.cyanide3d.discord.jda.api.contexts.SlashOptionReader;
 import ru.cyanide3d.discord.jda.api.contexts.SlashPath;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +30,11 @@ public class CommandIndex {
     }
 
     public void put(@NonNull SlashPath path, Restriction<?> restriction, @NonNull SlashExecutor executor) {
-        this.put(new ResolvedSlashLeaf(path, restriction, executor));
+        this.put(new ResolvedSlashLeaf(path, restriction, new ArrayList<>(), executor));
+    }
+
+    public void put(@NonNull SlashPath path, Restriction<?> restriction, @NonNull List<SlashOptionReader<?>> options, @NonNull SlashExecutor executor) {
+        this.put(new ResolvedSlashLeaf(path, restriction, options, executor));
     }
 
     public ResolvedSlashLeaf get(SlashPath path) {

@@ -2,7 +2,6 @@ package ru.cyanide3d.discord.jda.plugin.lavalink.command.player;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.cyanide3d.discord.jda.api.command.SlashExecutor;
 import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
@@ -12,6 +11,8 @@ import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerManager;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerPlayResult;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerResultMessageFormatter;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.YoutubeTrackIdentifier;
+
+import static ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerCommandSpec.QUERY;
 
 public class PlayerPlayCommandExecutor implements SlashExecutor {
 
@@ -26,11 +27,7 @@ public class PlayerPlayCommandExecutor implements SlashExecutor {
 
     @Override
     public void execute(SlashCommandContext ctx) {
-        String query = ctx.getEvent().getOption("query", "", OptionMapping::getAsString);
-        if (query.isBlank()) {
-            ctx.replyEphemeral("Нужно указать `query` — название трека или URL.");
-            return;
-        }
+        String query = ctx.requireOption(QUERY);
 
         Guild guild = ctx.requireGuild();
         Member member = ctx.requireMember();

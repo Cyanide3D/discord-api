@@ -4,17 +4,20 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.With;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ru.cyanide3d.discord.jda.api.contexts.SlashOptionReader;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 @Getter
 @With
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class OptionSpec {
+public class OptionSpec<T> implements SlashOptionReader<T> {
 
     private final OptionType type;
 
@@ -28,71 +31,57 @@ public class OptionSpec {
 
     private final List<ChoiceSpec> choices;
 
-    public static OptionSpec of(OptionType type, String name, String description) {
-        return new OptionSpec(type, name, description, false, false, new ArrayList<>());
+    private final Function<OptionMapping, T> reader;
+
+    public static <T> OptionSpec<T> of(OptionType type, String name, String description, Function<OptionMapping, T> reader) {
+        return new OptionSpec<>(type, name, description, false, false, new ArrayList<>(), reader);
     }
 
-    public static OptionSpec string(String name, String description) {
-        return of(OptionType.STRING, name, description);
+    public static OptionSpec<String> string(String name, String description) {
+        return of(OptionType.STRING, name, description, OptionMapping::getAsString);
     }
 
-    public static OptionSpec integer(String name, String description) {
-        return of(OptionType.INTEGER, name, description);
+    public static OptionSpec<Long> integer(String name, String description) {
+        return of(OptionType.INTEGER, name, description, OptionMapping::getAsLong);
     }
 
-    public static OptionSpec bool(String name, String description) {
-        return of(OptionType.BOOLEAN, name, description);
+    public static OptionSpec<Boolean> bool(String name, String description) {
+        return of(OptionType.BOOLEAN, name, description, OptionMapping::getAsBoolean);
     }
 
-    public static OptionSpec user(String name, String description) {
-        return of(OptionType.USER, name, description);
+    public static OptionSpec<Double> number(String name, String description) {
+        return of(OptionType.NUMBER, name, description, OptionMapping::getAsDouble);
     }
 
-    public static OptionSpec channel(String name, String description) {
-        return of(OptionType.CHANNEL, name, description);
+    public static OptionSpec<String> userId(String name, String description) {
+        return of(OptionType.USER, name, description, m -> m.getAsUser().getId());
     }
 
-    public static OptionSpec role(String name, String description) {
-        return of(OptionType.ROLE, name, description);
-    }
-
-    public static OptionSpec mentionable(String name, String description) {
-        return of(OptionType.MENTIONABLE, name, description);
-    }
-
-    public static OptionSpec number(String name, String description) {
-        return of(OptionType.NUMBER, name, description);
-    }
-
-    public static OptionSpec attachment(String name, String description) {
-        return of(OptionType.ATTACHMENT, name, description);
-    }
-
-    public OptionSpec required() {
+    public OptionSpec<T> required() {
         return withRequired(true);
     }
 
-    public OptionSpec optional() {
+    public OptionSpec<T> optional() {
         return withRequired(false);
     }
 
-    public OptionSpec autoComplete() {
+    public OptionSpec<T> autoComplete() {
         return withAutoComplete(true);
     }
 
-    public OptionSpec choice(String name, String value) {
+    public OptionSpec<T> choice(String name, String value) {
         List<ChoiceSpec> copy = new ArrayList<>(choices);
         copy.add(ChoiceSpec.of(name, value));
         return withChoices(copy);
     }
 
-    public OptionSpec choice(String name, long value) {
+    public OptionSpec<T> choice(String name, long value) {
         List<ChoiceSpec> copy = new ArrayList<>(choices);
         copy.add(ChoiceSpec.of(name, value));
         return withChoices(copy);
     }
 
-    public OptionSpec choice(String name, double value) {
+    public OptionSpec<T> choice(String name, double value) {
         List<ChoiceSpec> copy = new ArrayList<>(choices);
         copy.add(ChoiceSpec.of(name, value));
         return withChoices(copy);
@@ -110,4 +99,8 @@ public class OptionSpec {
         return data;
     }
 
+    @Override
+    public T read(OptionMapping mapping) {
+        return reader.apply(mapping);
+    }
 }

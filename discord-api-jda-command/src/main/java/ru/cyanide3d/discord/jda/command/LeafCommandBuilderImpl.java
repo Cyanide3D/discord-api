@@ -23,7 +23,7 @@ public class LeafCommandBuilderImpl<T> implements LeafCommandBuilder<T> {
 
     private final Consumer<SubcommandSpec> consumer;
 
-    private final List<OptionSpec> options = new ArrayList<>();
+    private final List<OptionSpec<?>> options = new ArrayList<>();
 
     private Restriction<SlashCommandContext> restriction;
 
@@ -43,7 +43,7 @@ public class LeafCommandBuilderImpl<T> implements LeafCommandBuilder<T> {
     }
 
     @Override
-    public LeafCommandBuilder<T> option(OptionSpec option) {
+    public LeafCommandBuilder<T> option(OptionSpec<?> option) {
         options.add(Objects.requireNonNull(option));
         return this;
     }

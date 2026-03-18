@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -30,9 +29,6 @@ public class EventContextFactoryImpl implements EventContextFactory {
     }
 
     protected <T extends GenericEvent> EventContext<T> doCreate(T event) {
-        if (event instanceof SlashCommandInteractionEvent e) {
-            return cast(new DefaultSlashCommandContext(e, discordRestActionExecutor));
-        }
         if (event instanceof ButtonInteractionEvent e) {
             return cast(new DefaultButtonInteractionContext(e, discordRestActionExecutor));
         }

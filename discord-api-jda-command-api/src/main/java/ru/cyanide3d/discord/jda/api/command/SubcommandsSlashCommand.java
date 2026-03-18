@@ -46,7 +46,7 @@ public class SubcommandsSlashCommand extends AbstractSlashCommand {
         CommandIndex index = new CommandIndex();
 
         getSubcommands().forEach(subcommand ->
-                index.put(new SlashPath(getName(), subcommand.getName()), and(getRestriction(), subcommand.getRestriction()), resolver.resolve(cast(subcommand.getExecutorSpec()))));
+                index.put(new SlashPath(getName(), subcommand.getName()), and(getRestriction(), subcommand.getRestriction()), List.copyOf(subcommand.getOptions()), resolver.resolve(cast(subcommand.getExecutorSpec()))));
 
         return index;
     }

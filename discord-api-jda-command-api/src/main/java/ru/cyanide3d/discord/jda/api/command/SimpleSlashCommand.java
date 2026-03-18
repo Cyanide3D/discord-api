@@ -17,11 +17,11 @@ import static ru.cyanide3d.utils.CastUtils.cast;
 @Getter
 public class SimpleSlashCommand extends AbstractSlashCommand {
 
-    private final List<OptionSpec> options;
+    private final List<OptionSpec<?>> options;
 
     private final ExecutorSpec executorSpec;
 
-    public SimpleSlashCommand(String name, String description, Restriction<SlashCommandContext> restriction, List<OptionSpec> options, ExecutorSpec executorSpec) {
+    public SimpleSlashCommand(String name, String description, Restriction<SlashCommandContext> restriction, List<OptionSpec<?>> options, ExecutorSpec executorSpec) {
         super(name, description, restriction);
         this.options = new ArrayList<>(options);
         this.executorSpec = executorSpec;
@@ -30,17 +30,17 @@ public class SimpleSlashCommand extends AbstractSlashCommand {
     @Override
     public CompiledSlashCommand compile(SlashExecutorResolver<?> resolver) {
         CommandIndex commandIndex = new CommandIndex();
-        commandIndex.put(new SlashPath(getName()), getRestriction(), resolver.resolve(cast(getExecutorSpec())));
+        commandIndex.put(new SlashPath(getName()), getRestriction(), new ArrayList<>(getOptions()), resolver.resolve(cast(getExecutorSpec())));
         return new CompiledSlashCommand(this, commandIndex, buildCommandData());
     }
 
-    public List<OptionSpec> getOptions() {
+    public List<OptionSpec<?>> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
     protected CommandData buildCommandData() {
         SlashCommandData data = Commands.slash(getName(), getDescription());
-        for (OptionSpec option : options) {
+        for (OptionSpec<?> option : options) {
             data.addOptions(option.toOptionData());
         }
         return data;

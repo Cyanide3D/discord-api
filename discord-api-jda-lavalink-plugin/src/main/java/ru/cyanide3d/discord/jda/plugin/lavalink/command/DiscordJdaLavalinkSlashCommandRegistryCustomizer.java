@@ -9,7 +9,7 @@ import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPauseComman
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPlayCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerStopCommandExecutor;
 
-import static ru.cyanide3d.discord.jda.api.command.OptionSpec.string;
+import static ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerCommandSpec.QUERY;
 
 public class DiscordJdaLavalinkSlashCommandRegistryCustomizer implements SlashCommandRegistryCustomizer {
 
@@ -34,7 +34,7 @@ public class DiscordJdaLavalinkSlashCommandRegistryCustomizer implements SlashCo
 
     protected void buildPlayCommand(LeafCommandBuilder<SubcommandsCommandBuilder> builder) {
         builder.onExecute(PlayerPlayCommandExecutor.class)
-                .option(string("query", "URL или название песни").required())
+                .option(QUERY)
                 .add();
     }
 

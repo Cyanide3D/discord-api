@@ -21,7 +21,7 @@ public class SimpleCommandBuilderImpl implements SimpleCommandBuilder {
 
     private Restriction<SlashCommandContext> restriction;
 
-    private final List<OptionSpec> options = new ArrayList<>();
+    private final List<OptionSpec<?>> options = new ArrayList<>();
 
     private ExecutorSpec executorSpec;
 
@@ -37,7 +37,7 @@ public class SimpleCommandBuilderImpl implements SimpleCommandBuilder {
     }
 
     @Override
-    public SimpleCommandBuilder option(OptionSpec option) {
+    public SimpleCommandBuilder option(OptionSpec<?> option) {
         options.add(Objects.requireNonNull(option));
         return this;
     }
