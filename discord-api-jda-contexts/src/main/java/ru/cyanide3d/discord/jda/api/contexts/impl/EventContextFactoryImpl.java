@@ -2,14 +2,22 @@ package ru.cyanide3d.discord.jda.api.contexts.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.guild.member.GenericGuildMemberEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.user.GenericUserEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.cyanide3d.discord.jda.api.contexts.DiscordRestActionExecutor;
 import ru.cyanide3d.discord.jda.api.contexts.EventContext;
@@ -52,6 +60,30 @@ public class EventContextFactoryImpl implements EventContextFactory {
         }
         if (event instanceof GuildMemberRemoveEvent e) {
             return cast(new DefaultGuildMemberRemoveContext(e));
+        }
+        if (event instanceof GuildVoiceUpdateEvent e) {
+            return cast(new DefaultGuildVoiceUpdateContext(e));
+        }
+        if (event instanceof GuildJoinEvent e) {
+            return cast(new DefaultGuildJoinContext(e));
+        }
+        if (event instanceof GuildLeaveEvent e) {
+            return cast(new DefaultGuildLeaveContext(e));
+        }
+        if (event instanceof GenericGuildMemberEvent e) {
+            return cast(new DefaultGenericGuildMemberEventContext<>(e));
+        }
+        if (event instanceof GenericGuildVoiceEvent e) {
+            return cast(new DefaultGenericGuildVoiceEventContext<>(e));
+        }
+        if (event instanceof GenericMessageEvent e) {
+            return cast(new DefaultGenericMessageEventContext<>(e, discordRestActionExecutor));
+        }
+        if (event instanceof GenericUserEvent e) {
+            return cast(new DefaultGenericUserEventContext<>(e));
+        }
+        if (event instanceof GenericGuildEvent e) {
+            return cast(new DefaultGenericGuildEventContext<>(e));
         }
 
         log.debug("Context for event {} not supported, fallback to default jda event context", event.getClass().getName());

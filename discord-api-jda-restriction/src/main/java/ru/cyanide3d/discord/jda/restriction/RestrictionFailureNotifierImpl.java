@@ -26,7 +26,7 @@ public class RestrictionFailureNotifierImpl implements RestrictionFailureNotifie
         }
 
         if (context instanceof MessageChannelSendCapability channelSendCapability) {
-            String message = getDeniedMessage(result);
+            String message = getErrorMessage(result);
             channelSendCapability.sendMessage(message);
             return;
         }
@@ -45,7 +45,7 @@ public class RestrictionFailureNotifierImpl implements RestrictionFailureNotifie
         }
 
         if (context instanceof MessageChannelSendCapability channelSendCapability) {
-            String message = getDeniedMessage(result);
+            String message = getErrorMessage(result);
             channelSendCapability.sendMessage(message);
             return;
         }
