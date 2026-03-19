@@ -5,11 +5,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandCompiler;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandContextFactory;
+import ru.cyanide3d.discord.jda.api.command.SlashCommandDispatcher;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandRegistry;
 import ru.cyanide3d.discord.jda.command.InstanceSlashExecutorResolver;
 import ru.cyanide3d.discord.jda.command.SlashCommandCompilerImpl;
 import ru.cyanide3d.discord.jda.command.SlashCommandContextFactoryImpl;
 import ru.cyanide3d.discord.jda.command.SlashCommandDiscordJDAEventListenerAdapter;
+import ru.cyanide3d.discord.jda.command.SlashCommandDispatcherImpl;
 import ru.cyanide3d.discord.jda.command.SlashCommandRegistryImpl;
 import ru.cyanide3d.discord.jda.command.SpringSlashExecutorResolver;
 
@@ -40,6 +42,11 @@ public class DiscordJDASlashCommandConfiguration {
     @Bean
     public SlashCommandContextFactory slashCommandContextFactory() {
         return new SlashCommandContextFactoryImpl();
+    }
+
+    @Bean
+    public SlashCommandDispatcher slashCommandDispatcher() {
+        return new SlashCommandDispatcherImpl();
     }
 
     @Bean
