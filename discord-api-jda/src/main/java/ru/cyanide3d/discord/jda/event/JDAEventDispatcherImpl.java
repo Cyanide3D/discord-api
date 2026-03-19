@@ -9,7 +9,6 @@ import ru.cyanide3d.discord.jda.api.contexts.EventContextFactory;
 import ru.cyanide3d.discord.jda.api.event.DiscordJDAEventHandler;
 import ru.cyanide3d.discord.jda.api.event.JDAEventDispatcher;
 import ru.cyanide3d.discord.jda.api.restriction.Restriction;
-import ru.cyanide3d.discord.jda.api.restriction.RestrictionFailureNotifier;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionResult;
 import ru.cyanide3d.discord.jda.api.restriction.RestrictionService;
 
@@ -27,26 +26,24 @@ public class JDAEventDispatcherImpl implements JDAEventDispatcher {
     @Autowired
     private EventContextFactory eventContextFactory;
 
-    @Autowired
-    private RestrictionFailureNotifier restrictionFailureNotifier;
-
     @Override
     public void dispatch(GenericEvent event) {
         EventContext<?> eventContext = createEventContext(event);
         log.debug("Received GenericEvent: {}", event.getClass().getName());
         discordEventHandlers.stream()
-                .filter(handler -> handler.supportEventContext(eventContext))
+                .filter(handler -> handler.supports(event, eventContext))
                 .map(handler -> {
                     log.debug("Handling GenericEvent by handler: {}", handler.getClass().getName());
                     return handler;
                 })
                 .filter(handler -> {
                     RestrictionResult result = enforceRestrictions(handler, eventContext);
-                    if (result.isAllowed()) {
-                        return true;
+                    if (!result.isAllowed()) {
+                        log.debug("Skipping handler {} because restriction failed: {}",
+                                handler.getClass().getName(), result);
+                        return false;
                     }
-                    failedCheckRestrictionNotification(result, eventContext);
-                    return false;
+                    return true;
                 })
                 .forEach(handler -> {
                     try {
@@ -55,10 +52,6 @@ public class JDAEventDispatcherImpl implements JDAEventDispatcher {
                         log.error("Failed to handle GenericEvent by handler: {}.", handler.getClass().getName(), e);
                     }
                 });
-    }
-
-    protected void failedCheckRestrictionNotification(RestrictionResult restrictionResult, EventContext<?> eventContext) {
-        restrictionFailureNotifier.notify(eventContext, restrictionResult);
     }
 
     protected EventContext<GenericEvent> createEventContext(GenericEvent event) {

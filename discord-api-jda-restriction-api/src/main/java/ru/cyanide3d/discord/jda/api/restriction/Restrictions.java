@@ -43,7 +43,9 @@ public class Restrictions {
     public static <T extends EventContext<?>> Restriction<T> or(Restriction<? super T>... restrictions) {
         return Arrays.stream(restrictions)
                 .filter(Objects::nonNull)
-                .reduce(Restriction.allow(), Restriction::or, Restriction::or);
+                .map(r -> (Restriction<T>) r)
+                .reduce(Restriction::or)
+                .orElseGet(Restriction::allow);
     }
 
     public static <B extends EventContext<?>> Restriction<EventContext<?>> when(Class<?> contextType, Restriction<? super B> rule, MissingCapabilityPolicy policy) {

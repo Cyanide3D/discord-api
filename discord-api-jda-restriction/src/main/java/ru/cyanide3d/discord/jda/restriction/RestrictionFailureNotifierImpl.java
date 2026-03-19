@@ -22,11 +22,13 @@ public class RestrictionFailureNotifierImpl implements RestrictionFailureNotifie
         if (context instanceof MessageReplyCapability messageReplyCapability) {
             String message = getDeniedMessage(result);
             messageReplyCapability.reply(message);
+            return;
         }
 
         if (context instanceof MessageChannelSendCapability channelSendCapability) {
             String message = getDeniedMessage(result);
             channelSendCapability.sendMessage(message);
+            return;
         }
     }
 
@@ -39,11 +41,13 @@ public class RestrictionFailureNotifierImpl implements RestrictionFailureNotifie
 
         if (context instanceof MessageReplyCapability replyCapability) {
             replyCapability.reply(getErrorMessage(result));
+            return;
         }
 
         if (context instanceof MessageChannelSendCapability channelSendCapability) {
             String message = getDeniedMessage(result);
             channelSendCapability.sendMessage(message);
+            return;
         }
     }
 
