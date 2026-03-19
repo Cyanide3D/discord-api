@@ -2,12 +2,16 @@ package ru.cyanide3d.discord.jda.plugin.lavalink.player;
 
 import dev.arbjerg.lavalink.client.LavalinkClient;
 import dev.arbjerg.lavalink.client.Link;
+import dev.arbjerg.lavalink.client.player.PlayerUpdateBuilder;
 import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.client.player.TrackUpdateBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.function.Consumer;
 
+@Slf4j
 public class PlayerManagerImpl implements PlayerManager {
 
     @Autowired
@@ -45,10 +49,12 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public PlayerActionResult pause(long guildId) {
-        Link link = lavalinkClient.getOrCreateLink(guildId);
-        link.updatePlayer(player -> player.setPaused(true)).block();
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null || !state.hasCurrentTrack()) {
+            return PlayerActionResult.success(PlayerActionType.PAUSED);
+        }
 
-        GuildPlayerState state = guildPlayerRegistry.getOrCreate(guildId);
+        updatePlayerSafely(guildId, player -> player.setPaused(true), "pause");
         state.setPaused(true);
 
         return PlayerActionResult.success(PlayerActionType.PAUSED);
@@ -56,10 +62,12 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public PlayerActionResult resume(long guildId) {
-        Link link = lavalinkClient.getOrCreateLink(guildId);
-        link.updatePlayer(player -> player.setPaused(false)).block();
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null || !state.hasCurrentTrack()) {
+            return PlayerActionResult.success(PlayerActionType.RESUMED);
+        }
 
-        GuildPlayerState state = guildPlayerRegistry.getOrCreate(guildId);
+        updatePlayerSafely(guildId, player -> player.setPaused(false), "resume");
         state.setPaused(false);
 
         return PlayerActionResult.success(PlayerActionType.RESUMED);
@@ -67,28 +75,31 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public PlayerActionResult stop(long guildId) {
-        Link link = lavalinkClient.getOrCreateLink(guildId);
-        link.updatePlayer(player -> player.setTrack(null)).block();
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null) {
+            return PlayerActionResult.success(PlayerActionType.STOPPED);
+        }
 
-        GuildPlayerState state = guildPlayerRegistry.getOrCreate(guildId);
-        state.setCurrentTrack(null);
-        state.clearQueue();
-        state.setPaused(false);
+        stopRemoteTrack(guildId);
+        resetLocalState(state);
+        guildPlayerRegistry.remove(guildId);
 
         return PlayerActionResult.success(PlayerActionType.STOPPED);
     }
 
     @Override
     public PlayerActionResult skip(long guildId) {
-        GuildPlayerState state = guildPlayerRegistry.getOrCreate(guildId);
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null) {
+            return PlayerActionResult.success(PlayerActionType.SKIPPED);
+        }
+
         Track next = state.pollNext();
 
         if (next == null) {
-            Link link = lavalinkClient.getOrCreateLink(guildId);
-            link.updatePlayer(player -> player.setTrack(null)).block();
-
-            state.setCurrentTrack(null);
-            state.setPaused(false);
+            stopRemoteTrack(guildId);
+            resetLocalState(state);
+            guildPlayerRegistry.remove(guildId);
 
             return PlayerActionResult.success(PlayerActionType.SKIPPED);
         }
@@ -99,20 +110,26 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public PlayerActionResult seek(long guildId, long positionMs) {
-        Link link = lavalinkClient.getOrCreateLink(guildId);
-        link.updatePlayer(player -> player.setPosition(positionMs)).block();
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null || !state.hasCurrentTrack()) {
+            return PlayerActionResult.success(PlayerActionType.SEEKED);
+        }
+
+        updatePlayerSafely(guildId, player -> player.setPosition(positionMs), "seek");
 
         return PlayerActionResult.success(PlayerActionType.SEEKED);
     }
 
     @Override
     public PlayerActionResult setVolume(long guildId, int volume) {
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null) {
+            return PlayerActionResult.success(PlayerActionType.VOLUME_CHANGED);
+        }
+
         int normalized = Math.max(0, Math.min(1000, volume));
 
-        Link link = lavalinkClient.getOrCreateLink(guildId);
-        link.updatePlayer(player -> player.setVolume(normalized)).block();
-
-        GuildPlayerState state = guildPlayerRegistry.getOrCreate(guildId);
+        updatePlayerSafely(guildId, player -> player.setVolume(normalized), "set volume");
         state.setVolume(normalized);
 
         return PlayerActionResult.success(PlayerActionType.VOLUME_CHANGED);
@@ -120,10 +137,52 @@ public class PlayerManagerImpl implements PlayerManager {
 
     @Override
     public PlayerActionResult clearQueue(long guildId) {
-        GuildPlayerState state = guildPlayerRegistry.getOrCreate(guildId);
-        state.clearQueue();
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null) {
+            return PlayerActionResult.success(PlayerActionType.QUEUE_CLEARED);
+        }
 
+        state.clearQueue();
         return PlayerActionResult.success(PlayerActionType.QUEUE_CLEARED);
+    }
+
+    @Override
+    public PlayerActionResult playNextIfAvailable(long guildId) {
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+        if (state == null) {
+            return PlayerActionResult.success(PlayerActionType.SKIPPED);
+        }
+
+        Track next = state.pollNext();
+
+        if (next == null) {
+            stopRemoteTrack(guildId);
+            resetLocalState(state);
+            guildPlayerRegistry.remove(guildId);
+            return PlayerActionResult.success(PlayerActionType.SKIPPED);
+        }
+
+        startTrackNow(guildId, state, next);
+        return PlayerActionResult.success(PlayerActionType.SKIPPED);
+    }
+
+    @Override
+    public PlayerActionResult forget(long guildId) {
+        GuildPlayerState state = guildPlayerRegistry.get(guildId);
+
+        if (state != null) {
+            resetLocalState(state);
+        }
+
+        try {
+            destroyRemoteLink(guildId);
+        } catch (Exception e) {
+            log.warn("Failed to destroy lavalink link for guildId={}", guildId, e);
+        } finally {
+            guildPlayerRegistry.remove(guildId);
+        }
+
+        return PlayerActionResult.success(PlayerActionType.FORGET);
     }
 
     protected PlayerPlayResult playPlaylist(long guildId, GuildPlayerState state, List<Track> tracks) {
@@ -155,5 +214,38 @@ public class PlayerManagerImpl implements PlayerManager {
 
         state.setCurrentTrack(track);
         state.setPaused(false);
+    }
+
+    protected void stopRemoteTrack(long guildId) {
+        try {
+            updatePlayerSafely(guildId, player -> player.setTrack(null), "stop track");
+        } catch (Exception e) {
+            log.warn("Failed to stop remote track for guildId={}", guildId, e);
+        }
+    }
+
+    protected void destroyRemoteLink(long guildId) {
+        Link link = lavalinkClient.getLinkIfCached(guildId);
+        if (link == null) {
+            return;
+        }
+
+        link.destroy().block();
+    }
+
+    protected void resetLocalState(GuildPlayerState state) {
+        state.setCurrentTrack(null);
+        state.clearQueue();
+        state.setPaused(false);
+    }
+
+    protected void updatePlayerSafely(long guildId, Consumer<PlayerUpdateBuilder> updater, String action) {
+        try {
+            lavalinkClient.getOrCreateLink(guildId)
+                    .updatePlayer(updater)
+                    .block();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to " + action + " for guildId=" + guildId, e);
+        }
     }
 }

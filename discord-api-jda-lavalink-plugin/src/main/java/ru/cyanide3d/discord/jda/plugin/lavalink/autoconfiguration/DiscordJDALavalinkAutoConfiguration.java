@@ -14,7 +14,11 @@ import ru.cyanide3d.discord.jda.plugin.lavalink.command.DiscordJdaLavalinkSlashC
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPauseCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPlayCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerStopCommandExecutor;
+import ru.cyanide3d.discord.jda.plugin.lavalink.event.LeaveGuildBotEvent;
+import ru.cyanide3d.discord.jda.plugin.lavalink.event.VoiceChannelLeftBotEvent;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.GuildPlayerRegistry;
+import ru.cyanide3d.discord.jda.plugin.lavalink.player.LavalinkShutdownCleanup;
+import ru.cyanide3d.discord.jda.plugin.lavalink.player.LavalinkTrackQueueListener;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerManager;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerManagerImpl;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerResultMessageFormatter;
@@ -92,6 +96,26 @@ public class DiscordJDALavalinkAutoConfiguration {
     @Bean
     public BotVoiceChannelSummoner botVoiceChannelSummoner() {
         return new BotVoiceChannelSummonerImpl();
+    }
+
+    @Bean
+    public VoiceChannelLeftBotEvent voiceChannelLeftBotEvent() {
+        return new VoiceChannelLeftBotEvent();
+    }
+
+    @Bean
+    public LavalinkTrackQueueListener lavalinkTrackQueueListener() {
+        return new LavalinkTrackQueueListener();
+    }
+
+    @Bean
+    public LeaveGuildBotEvent  leaveGuildBotEvent() {
+        return new LeaveGuildBotEvent();
+    }
+
+    @Bean
+    public LavalinkShutdownCleanup lavalinkShutdownCleanup() {
+        return new LavalinkShutdownCleanup();
     }
 
 }

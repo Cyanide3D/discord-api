@@ -1,10 +1,10 @@
 package ru.cyanide3d.discord.jda.plugin.lavalink;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
-import net.dv8tion.jda.api.managers.AudioManager;
 import ru.cyanide3d.discord.jda.plugin.lavalink.diag.JoiningErrorException;
 import ru.cyanide3d.discord.jda.plugin.lavalink.diag.UserNotInVoiceChannelException;
 
@@ -26,10 +26,9 @@ public class BotVoiceChannelSummonerImpl implements BotVoiceChannelSummoner {
     }
 
     protected void doSummon(Guild guild, AudioChannel audioChannel) {
-        AudioManager audioManager = guild.getAudioManager();
-        audioManager.openAudioConnection(audioChannel);
+        JDA jda = guild.getJDA();
         try {
-            audioManager.openAudioConnection(audioChannel);
+            jda.getDirectAudioController().connect(audioChannel);
         } catch (Exception e) {
             throw new JoiningErrorException(e);
         }

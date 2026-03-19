@@ -136,6 +136,15 @@ public class Restrictions {
         );
     }
 
+    public static Restriction<EventContext<?>> selfBotOnly() {
+        return whenMember(
+                ctx -> ctx.requireMember().equals(ctx.requireGuild().getSelfMember())
+                        ? RestrictionResult.allow()
+                        : RestrictionResult.deny(),
+                MissingCapabilityPolicy.DENY
+        );
+    }
+
     public static Restriction<EventContext<?>> interactionOnly() {
         return whenInteraction(Restriction.allow(), MissingCapabilityPolicy.DENY);
     }

@@ -26,6 +26,8 @@ public enum PlayerActionType {
 
     NOT_FOUND,
 
-    FAILED
+    FAILED,
+
+    FORGET
 
 }

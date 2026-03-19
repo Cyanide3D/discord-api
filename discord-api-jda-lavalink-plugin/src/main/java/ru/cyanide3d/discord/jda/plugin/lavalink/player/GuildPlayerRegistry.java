@@ -1,6 +1,7 @@
 package ru.cyanide3d.discord.jda.plugin.lavalink.player;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GuildPlayerRegistry {
@@ -17,5 +18,9 @@ public class GuildPlayerRegistry {
 
     public void remove(long guildId) {
         players.remove(guildId);
+    }
+
+    public Set<Long> guildIds() {
+        return Set.copyOf(players.keySet());
     }
 }

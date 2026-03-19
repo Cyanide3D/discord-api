@@ -18,4 +18,7 @@ public interface PlayerManager {
 
     PlayerActionResult clearQueue(long guildId);
 
+    PlayerActionResult playNextIfAvailable(long guildId);
+
+    PlayerActionResult forget(long guildId);
 }
