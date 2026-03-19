@@ -29,7 +29,7 @@ public class RestrictionServiceImpl implements RestrictionService {
             return result;
         } catch (Exception e) {
             log.error("Error while checking restriction for event {}", eventContext.getClass().getSimpleName(), e);
-            return RestrictionResult.deny();
+            return RestrictionResult.error(e);
         }
     }
 

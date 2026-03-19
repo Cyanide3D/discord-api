@@ -1,7 +1,6 @@
 package ru.cyanide3d.discord.jda.restriction;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import ru.cyanide3d.discord.jda.api.contexts.EventContext;
 import ru.cyanide3d.discord.jda.api.contexts.capability.InteractionResponseCapability;
 import ru.cyanide3d.discord.jda.api.contexts.capability.MessageChannelSendCapability;
@@ -13,29 +12,48 @@ import ru.cyanide3d.discord.jda.api.restriction.RestrictionResult;
 public class RestrictionFailureNotifierImpl implements RestrictionFailureNotifier {
 
     @Override
-    public void notify(RestrictionResult result, EventContext<?> context) {
-        String reason = result.getReason();
-        if (!StringUtils.hasText(reason)) {
+    public void notifyDenied(EventContext<?> context, RestrictionResult result) {
+        if (context instanceof InteractionResponseCapability interaction) {
+            String message = getDeniedMessage(result);
+            interaction.replyEphemeral(message);
             return;
         }
 
-        try {
-            if (context instanceof InteractionResponseCapability interaction) {
-                interaction.reply(reason);
-                return;
-            }
+        if (context instanceof MessageReplyCapability messageReplyCapability) {
+            String message = getDeniedMessage(result);
+            messageReplyCapability.reply(message);
+        }
 
-            if (context instanceof MessageReplyCapability messageReply) {
-                messageReply.reply(reason);
-                return;
-            }
-
-            if (context instanceof MessageChannelSendCapability channelSend) {
-                channelSend.sendMessage(reason);
-            }
-        } catch (Exception e) {
-            log.warn("Failed to notify restriction denial for event context: {}", context.getClass().getName(), e);
+        if (context instanceof MessageChannelSendCapability channelSendCapability) {
+            String message = getDeniedMessage(result);
+            channelSendCapability.sendMessage(message);
         }
     }
 
+    @Override
+    public void notifyError(EventContext<?> context, RestrictionResult result) {
+        if (context instanceof InteractionResponseCapability interaction) {
+            interaction.replyEphemeral(getErrorMessage(result));
+            return;
+        }
+
+        if (context instanceof MessageReplyCapability replyCapability) {
+            replyCapability.reply(getErrorMessage(result));
+        }
+
+        if (context instanceof MessageChannelSendCapability channelSendCapability) {
+            String message = getDeniedMessage(result);
+            channelSendCapability.sendMessage(message);
+        }
+    }
+
+    protected String getDeniedMessage(RestrictionResult result) {
+        return result.getReason() != null
+                ? result.getReason()
+                : "Недостаточно прав для выполнения этой команды.";
+    }
+
+    protected String getErrorMessage(RestrictionResult result) {
+        return "Во время проверки ограничений произошла внутренняя ошибка.";
+    }
 }

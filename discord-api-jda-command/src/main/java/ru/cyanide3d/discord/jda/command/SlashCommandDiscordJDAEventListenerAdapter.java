@@ -69,7 +69,7 @@ public class SlashCommandDiscordJDAEventListenerAdapter extends AbstractDiscordJ
     }
 
     protected void failedCheckRestrictionNotification(RestrictionResult restrictionResult, EventContext<?> eventContext) {
-        restrictionFailureNotifier.notify(restrictionResult, eventContext);
+        restrictionFailureNotifier.notify(eventContext, restrictionResult);
     }
 
     protected RestrictionResult checkRestriction(Restriction<?> restriction, EventContext<?> eventContext) {

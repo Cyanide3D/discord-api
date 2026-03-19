@@ -65,7 +65,7 @@ public class GenericEventDiscordJDAEventListenerAdapter extends AbstractDiscordJ
     }
 
     protected void failedCheckRestrictionNotification(RestrictionResult restrictionResult, EventContext<?> eventContext) {
-        restrictionFailureNotifier.notify(restrictionResult, eventContext);
+        restrictionFailureNotifier.notify(eventContext, restrictionResult);
     }
 
     protected EventContext<GenericEvent> createEventContext(GenericEvent event) {
