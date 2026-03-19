@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.cyanide3d.discord.jda.api.command.SlashExecutor;
 import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
 import ru.cyanide3d.discord.jda.plugin.lavalink.BotVoiceChannelSummoner;
-import ru.cyanide3d.discord.jda.plugin.lavalink.diag.UserNotInVoiceChannelException;
+import ru.cyanide3d.discord.jda.plugin.lavalink.diag.JoiningErrorException;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerManager;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerPlayResult;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerResultMessageFormatter;
@@ -28,18 +28,25 @@ public class PlayerPlayCommandExecutor implements SlashExecutor {
     @Override
     public void execute(SlashCommandContext ctx) {
         String query = ctx.requireOption(QUERY);
+        if (query == null || query.trim().isEmpty()) {
+            ctx.replyEphemeral("Нужно указать поисковый запрос или ссылку.");
+            return;
+        }
 
         Guild guild = ctx.requireGuild();
         Member member = ctx.requireMember();
 
         try {
             botVoiceChannelSummoner.summonTo(guild, member);
-        } catch (UserNotInVoiceChannelException e) {
-            ctx.replyEphemeral("Нужно быть в голосовом чате, чтобы использовать команду.");
+        } catch (JoiningErrorException e) {
+            ctx.replyEphemeral("Не удалось подключить бота к голосовому каналу.");
             return;
         }
 
-        PlayerPlayResult result = playerManager.play(guild.getIdLong(), YoutubeTrackIdentifier.of(query));
+        PlayerPlayResult result = playerManager.play(
+                guild.getIdLong(),
+                YoutubeTrackIdentifier.of(query.trim())
+        );
 
         String message = playerResultMessageFormatter.format(result);
         if (result.isSuccess()) {
