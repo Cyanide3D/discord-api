@@ -72,15 +72,10 @@ public final class ChoiceSpec {
             String localizedName = entry.getValue();
 
             if (locale == null) {
-                throw new IllegalStateException(
-                        "Choice #" + index + " of option '" + optionName + "' has null localization locale"
-                );
+                throw new IllegalStateException("Choice #" + index + " of option '" + optionName + "' has null localization locale");
             }
 
-            requireNonBlank(
-                    localizedName,
-                    "Choice #" + index + " of option '" + optionName + "' has blank localized name for locale " + locale
-            );
+            requireNonBlank(localizedName, "Choice #" + index + " of option '" + optionName + "' has blank localized name for locale " + locale);
         }
 
         switch (kind) {
@@ -111,16 +106,11 @@ public final class ChoiceSpec {
 
     private void validateStringChoice(OptionType optionType, String optionName, int index) {
         if (optionType != OptionType.STRING) {
-            throw new IllegalStateException(
-                    "Choice #" + index + " of option '" + optionName + "' is STRING, but option type is " + optionType
-            );
+            throw new IllegalStateException("Choice #" + index + " of option '" + optionName + "' is STRING, but option type is " + optionType);
         }
 
         String stringValue = (String) value;
-        requireNonBlank(
-                stringValue,
-                "Choice #" + index + " of option '" + optionName + "' has blank string value"
-        );
+        requireNonBlank(stringValue, "Choice #" + index + " of option '" + optionName + "' has blank string value");
     }
 
     private void validateLongChoice(OptionType optionType, String optionName, int index) {
@@ -133,16 +123,12 @@ public final class ChoiceSpec {
 
     private void validateDoubleChoice(OptionType optionType, String optionName, int index) {
         if (optionType != OptionType.NUMBER) {
-            throw new IllegalStateException(
-                    "Choice #" + index + " of option '" + optionName + "' is DOUBLE, but option type is " + optionType
-            );
+            throw new IllegalStateException("Choice #" + index + " of option '" + optionName + "' is DOUBLE, but option type is " + optionType);
         }
 
         double doubleValue = (double) value;
         if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue)) {
-            throw new IllegalStateException(
-                    "Choice #" + index + " of option '" + optionName + "' has non-finite double value"
-            );
+            throw new IllegalStateException("Choice #" + index + " of option '" + optionName + "' has non-finite double value");
         }
     }
 

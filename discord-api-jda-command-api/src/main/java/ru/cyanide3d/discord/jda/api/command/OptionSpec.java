@@ -153,22 +153,7 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     public <R> OptionSpec<R> map(Function<? super T, ? extends R> mapper) {
         Objects.requireNonNull(mapper, "mapper");
 
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                mapping -> mapper.apply(reader.apply(mapping))
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, mapping -> mapper.apply(reader.apply(mapping)));
     }
 
     public OptionSpec<T> required() {
@@ -180,22 +165,7 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     }
 
     public OptionSpec<T> required(boolean required) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> autoComplete() {
@@ -207,44 +177,14 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     }
 
     public OptionSpec<T> autoComplete(boolean autoComplete) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> choice(ChoiceSpec choice) {
         ArrayList<ChoiceSpec> copy = new ArrayList<>(choices);
         copy.add(Objects.requireNonNull(choice, "choice"));
 
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                copy,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, copy, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> choices(ChoiceSpec... choices) {
@@ -268,22 +208,7 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     }
 
     public OptionSpec<T> clearChoices() {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                List.of(),
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, List.of(), channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> choice(String choiceName, String value) {
@@ -312,117 +237,27 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     public OptionSpec<T> channelTypes(Collection<ChannelType> channelTypes) {
         LinkedHashSet<ChannelType> copy = new LinkedHashSet<>(Objects.requireNonNull(channelTypes, "channelTypes"));
 
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                copy,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, copy, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> clearChannelTypes() {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                Set.of(),
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, Set.of(), minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> minValue(long minValue) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> minValue(double minValue) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> maxValue(long maxValue) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> maxValue(double maxValue) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> range(long minValue, long maxValue) {
@@ -434,60 +269,15 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     }
 
     public OptionSpec<T> clearValueRange() {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                null,
-                null,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, null, null, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> minLength(int minLength) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> maxLength(int maxLength) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> length(int exactLength) {
@@ -495,167 +285,47 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     }
 
     public OptionSpec<T> lengthRange(int minLength, int maxLength) {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> clearLengthRange() {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                null,
-                null,
-                nameLocalizations,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, null, null, nameLocalizations, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> nameLocalization(DiscordLocale locale, String localizedName) {
         LinkedHashMap<DiscordLocale, String> copy = new LinkedHashMap<>(nameLocalizations);
         copy.put(Objects.requireNonNull(locale, "locale"), Objects.requireNonNull(localizedName, "localizedName"));
 
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                copy,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, copy, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> nameLocalizations(Map<DiscordLocale, String> localizations) {
         LinkedHashMap<DiscordLocale, String> copy = new LinkedHashMap<>(nameLocalizations);
         copy.putAll(Objects.requireNonNull(localizations, "localizations"));
 
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                copy,
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, copy, descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> clearNameLocalizations() {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                Map.of(),
-                descriptionLocalizations,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, Map.of(), descriptionLocalizations, reader);
     }
 
     public OptionSpec<T> descriptionLocalization(DiscordLocale locale, String localizedDescription) {
         LinkedHashMap<DiscordLocale, String> copy = new LinkedHashMap<>(descriptionLocalizations);
         copy.put(Objects.requireNonNull(locale, "locale"), Objects.requireNonNull(localizedDescription, "localizedDescription"));
 
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                copy,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, copy, reader);
     }
 
     public OptionSpec<T> descriptionLocalizations(Map<DiscordLocale, String> localizations) {
         LinkedHashMap<DiscordLocale, String> copy = new LinkedHashMap<>(descriptionLocalizations);
         copy.putAll(Objects.requireNonNull(localizations, "localizations"));
 
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                copy,
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, copy, reader);
     }
 
     public OptionSpec<T> clearDescriptionLocalizations() {
-        return new OptionSpec<>(
-                type,
-                name,
-                description,
-                required,
-                autoComplete,
-                choices,
-                channelTypes,
-                minValue,
-                maxValue,
-                minLength,
-                maxLength,
-                nameLocalizations,
-                Map.of(),
-                reader
-        );
+        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, Map.of(), reader);
     }
 
     @Override
