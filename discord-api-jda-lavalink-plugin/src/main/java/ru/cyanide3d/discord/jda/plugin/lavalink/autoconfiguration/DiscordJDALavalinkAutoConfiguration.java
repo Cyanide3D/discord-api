@@ -12,6 +12,7 @@ import ru.cyanide3d.discord.jda.plugin.lavalink.LavalinkClientFactory;
 import ru.cyanide3d.discord.jda.plugin.lavalink.LavalinkClientFactoryImpl;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.DiscordJdaLavalinkSlashCommandRegistryCustomizer;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerClearQueueCommandExecutor;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerLeaveCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPauseCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPlayCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerQueueCommandExecutor;
@@ -153,4 +154,10 @@ public class DiscordJDALavalinkAutoConfiguration {
     public PlayerVolumeCommandExecutor playerVolumeCommandExecutor() {
         return new PlayerVolumeCommandExecutor();
     }
+
+    @Bean
+    public PlayerLeaveCommandExecutor playerLeaveCommandExecutor() {
+        return new PlayerLeaveCommandExecutor();
+    }
+
 }

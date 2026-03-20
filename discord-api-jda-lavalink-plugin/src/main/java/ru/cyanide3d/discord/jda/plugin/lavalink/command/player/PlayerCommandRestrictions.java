@@ -32,6 +32,16 @@ public final class PlayerCommandRestrictions {
         );
     }
 
+    public static Restriction<SlashCommandContext> leave() {
+        return all(
+                adapt(Restrictions.guildOnly()),
+                adapt(Restrictions.memberOnly()),
+                userInVoiceChannel(),
+                botInVoiceChannel(),
+                userInSameVoiceChannelAsBot()
+        );
+    }
+
     public static Restriction<SlashCommandContext> userInVoiceChannel() {
         return Restrictions.predicate(
                 ctx -> {

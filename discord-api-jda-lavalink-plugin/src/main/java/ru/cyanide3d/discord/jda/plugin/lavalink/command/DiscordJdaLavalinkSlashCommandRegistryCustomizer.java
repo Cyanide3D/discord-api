@@ -8,6 +8,7 @@ import ru.cyanide3d.discord.jda.api.command.SubcommandsCommandBuilder;
 import ru.cyanide3d.discord.jda.command.Slash;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerClearQueueCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerCommandRestrictions;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerLeaveCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPauseCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPlayCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerQueueCommandExecutor;
@@ -40,6 +41,7 @@ public class DiscordJdaLavalinkSlashCommandRegistryCustomizer implements SlashCo
                 .subcommand("queue", "Показать очередь треков", this::buildQueueCommand)
                 .subcommand("clear", "Очистить очередь", this::buildClearQueueCommand)
                 .subcommand("stop", "Остановить плеер", this::buildStopCommand)
+                .subcommand("leave", "Отключить бота от голосового канала", this::buildLeaveCommand)
                 .build());
     }
 
@@ -98,6 +100,12 @@ public class DiscordJdaLavalinkSlashCommandRegistryCustomizer implements SlashCo
         builder.onExecute(PlayerPlayCommandExecutor.class)
                 .restrict(PlayerCommandRestrictions.play())
                 .option(QUERY)
+                .add();
+    }
+
+    protected void buildLeaveCommand(LeafCommandBuilder<SubcommandsCommandBuilder> builder) {
+        builder.onExecute(PlayerLeaveCommandExecutor.class)
+                .restrict(PlayerCommandRestrictions.leave())
                 .add();
     }
 
