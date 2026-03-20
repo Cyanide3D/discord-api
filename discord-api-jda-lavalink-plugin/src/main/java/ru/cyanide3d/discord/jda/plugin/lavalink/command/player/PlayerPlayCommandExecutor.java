@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.cyanide3d.discord.jda.api.command.SlashExecutor;
 import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
-import ru.cyanide3d.discord.jda.plugin.lavalink.BotVoiceChannelSummoner;
+import ru.cyanide3d.discord.jda.plugin.lavalink.BotVoiceChannelConnector;
 import ru.cyanide3d.discord.jda.plugin.lavalink.diag.JoiningErrorException;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerManager;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerPlayResult;
@@ -17,7 +17,7 @@ import static ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerComm
 public class PlayerPlayCommandExecutor implements SlashExecutor {
 
     @Autowired
-    private BotVoiceChannelSummoner botVoiceChannelSummoner;
+    private BotVoiceChannelConnector botVoiceChannelConnector;
 
     @Autowired
     private PlayerManager playerManager;
@@ -37,7 +37,7 @@ public class PlayerPlayCommandExecutor implements SlashExecutor {
         Member member = ctx.requireMember();
 
         try {
-            botVoiceChannelSummoner.summonTo(guild, member);
+            botVoiceChannelConnector.connectTo(guild, member);
         } catch (JoiningErrorException e) {
             ctx.replyEphemeral("Не удалось подключить бота к голосовому каналу.");
             return;

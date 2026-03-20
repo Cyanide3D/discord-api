@@ -5,15 +5,21 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import ru.cyanide3d.discord.jda.plugin.lavalink.BotVoiceChannelSummoner;
-import ru.cyanide3d.discord.jda.plugin.lavalink.BotVoiceChannelSummonerImpl;
+import ru.cyanide3d.discord.jda.plugin.lavalink.BotVoiceChannelConnector;
+import ru.cyanide3d.discord.jda.plugin.lavalink.BotVoiceChannelConnectorImpl;
 import ru.cyanide3d.discord.jda.plugin.lavalink.DiscordJDALavalinkCustomizer;
 import ru.cyanide3d.discord.jda.plugin.lavalink.LavalinkClientFactory;
 import ru.cyanide3d.discord.jda.plugin.lavalink.LavalinkClientFactoryImpl;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.DiscordJdaLavalinkSlashCommandRegistryCustomizer;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerClearQueueCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPauseCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerPlayCommandExecutor;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerQueueCommandExecutor;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerResumeCommandExecutor;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerSeekCommandExecutor;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerSkipCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerStopCommandExecutor;
+import ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerVolumeCommandExecutor;
 import ru.cyanide3d.discord.jda.plugin.lavalink.event.LeaveGuildBotEvent;
 import ru.cyanide3d.discord.jda.plugin.lavalink.event.VoiceChannelLeftBotEvent;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.GuildPlayerRegistry;
@@ -94,8 +100,8 @@ public class DiscordJDALavalinkAutoConfiguration {
     }
 
     @Bean
-    public BotVoiceChannelSummoner botVoiceChannelSummoner() {
-        return new BotVoiceChannelSummonerImpl();
+    public BotVoiceChannelConnector botVoiceChannelConnector() {
+        return new BotVoiceChannelConnectorImpl();
     }
 
     @Bean
@@ -118,4 +124,33 @@ public class DiscordJDALavalinkAutoConfiguration {
         return new LavalinkShutdownCleanup();
     }
 
+    @Bean
+    public PlayerClearQueueCommandExecutor playerClearQueueCommandExecutor() {
+        return new PlayerClearQueueCommandExecutor();
+    }
+
+    @Bean
+    public PlayerQueueCommandExecutor playerQueueCommandExecutor() {
+        return new PlayerQueueCommandExecutor();
+    }
+
+    @Bean
+    public PlayerResumeCommandExecutor playerResumeCommandExecutor() {
+        return new PlayerResumeCommandExecutor();
+    }
+
+    @Bean
+    public PlayerSeekCommandExecutor playerSeekCommandExecutor() {
+        return new PlayerSeekCommandExecutor();
+    }
+
+    @Bean
+    public PlayerSkipCommandExecutor playerSkipCommandExecutor() {
+        return new PlayerSkipCommandExecutor();
+    }
+
+    @Bean
+    public PlayerVolumeCommandExecutor playerVolumeCommandExecutor() {
+        return new PlayerVolumeCommandExecutor();
+    }
 }

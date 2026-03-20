@@ -4,10 +4,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 
-public interface BotVoiceChannelSummoner {
+public interface BotVoiceChannelConnector {
 
-    void summonTo(AudioChannel channel);
+    void connectTo(AudioChannel channel);
 
-    void summonTo(Guild guild, Member member);
+    void connectTo(Guild guild, Member member);
+
+    void disconnectFrom(Guild guild);
 
 }

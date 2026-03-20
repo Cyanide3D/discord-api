@@ -6,7 +6,7 @@ import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerActionResult;
 import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerManager;
 
-public class PlayerStopCommandExecutor extends AbstractPlayerCommandExecutor implements SlashExecutor {
+public class PlayerResumeCommandExecutor extends AbstractPlayerCommandExecutor implements SlashExecutor {
 
     @Autowired
     private PlayerManager playerManager;
@@ -15,7 +15,7 @@ public class PlayerStopCommandExecutor extends AbstractPlayerCommandExecutor imp
     public void execute(SlashCommandContext ctx) {
         long guildId = ctx.requireGuild().getIdLong();
 
-        PlayerActionResult result = playerManager.stop(guildId);
+        PlayerActionResult result = playerManager.resume(guildId);
         replyWithPlayerResult(ctx, result);
     }
 }
