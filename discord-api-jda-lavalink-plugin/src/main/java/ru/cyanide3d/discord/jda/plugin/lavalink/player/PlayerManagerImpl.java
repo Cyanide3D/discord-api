@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static ru.cyanide3d.discord.jda.plugin.lavalink.ReactorUtils.awaitVoid;
+
 @Slf4j
 public class PlayerManagerImpl implements PlayerManager {
 
@@ -204,13 +206,7 @@ public class PlayerManagerImpl implements PlayerManager {
 
     protected void startTrackNow(long guildId, GuildPlayerState state, Track track) {
         Link link = lavalinkClient.getOrCreateLink(guildId);
-        link.updatePlayer(player ->
-                player.updateTrack(
-                        new TrackUpdateBuilder()
-                                .setEncoded(track.getEncoded())
-                                .build()
-                )
-        ).block();
+        awaitVoid(link.updatePlayer(player -> player.updateTrack(new TrackUpdateBuilder().setEncoded(track.getEncoded()).build())), guildId, "startTrackNow");
 
         state.setCurrentTrack(track);
         state.setPaused(false);
@@ -230,7 +226,7 @@ public class PlayerManagerImpl implements PlayerManager {
             return;
         }
 
-        link.destroy().block();
+        awaitVoid(link.destroy(), guildId, "destroy_player");
     }
 
     protected void resetLocalState(GuildPlayerState state) {
@@ -241,11 +237,10 @@ public class PlayerManagerImpl implements PlayerManager {
 
     protected void updatePlayerSafely(long guildId, Consumer<PlayerUpdateBuilder> updater, String action) {
         try {
-            lavalinkClient.getOrCreateLink(guildId)
-                    .updatePlayer(updater)
-                    .block();
+            awaitVoid(lavalinkClient.getOrCreateLink(guildId).updatePlayer(updater), guildId, action);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to " + action + " for guildId=" + guildId, e);
         }
     }
+
 }

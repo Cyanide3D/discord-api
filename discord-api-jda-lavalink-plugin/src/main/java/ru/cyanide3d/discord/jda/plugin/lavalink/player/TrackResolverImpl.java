@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 
+import static ru.cyanide3d.discord.jda.plugin.lavalink.ReactorUtils.await;
+
 public class TrackResolverImpl implements TrackResolver {
 
     @Autowired
@@ -19,7 +21,7 @@ public class TrackResolverImpl implements TrackResolver {
     public TrackLoadResult resolve(TrackIdentifier identifier, long guildId) {
         Link link = lavalinkClient.getOrCreateLink(guildId);
 
-        LavalinkLoadResult result = link.loadItem(identifier.buildStringIdentifier()).block();
+        LavalinkLoadResult result = await(link.loadItem(identifier.buildStringIdentifier()), guildId, "resolve_Track");
         if (result == null) {
             return TrackLoadResult.of(Collections.emptyList(), false, identifier.sourceName());
         }
