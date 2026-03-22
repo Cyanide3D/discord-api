@@ -4,10 +4,11 @@ import dev.arbjerg.lavalink.client.player.Track;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.cyanide3d.discord.jda.api.command.SlashExecutor;
 import ru.cyanide3d.discord.jda.api.contexts.SlashCommandContext;
-import ru.cyanide3d.discord.jda.plugin.lavalink.player.GuildPlayerRegistry;
-import ru.cyanide3d.discord.jda.plugin.lavalink.player.GuildPlayerState;
+import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerManager;
+import ru.cyanide3d.discord.jda.plugin.lavalink.player.PlayerQueueSnapshot;
 
 import java.util.List;
+import java.util.Optional;
 
 import static ru.cyanide3d.discord.jda.plugin.lavalink.command.player.PlayerCommandSpec.PAGE;
 
@@ -16,17 +17,11 @@ public class PlayerQueueCommandExecutor implements SlashExecutor {
     private static final int PAGE_SIZE = 10;
 
     @Autowired
-    private GuildPlayerRegistry guildPlayerRegistry;
+    private PlayerManager playerManager;
 
     @Override
     public void execute(SlashCommandContext ctx) {
         long guildId = ctx.requireGuild().getIdLong();
-        GuildPlayerState state = guildPlayerRegistry.get(guildId);
-
-        if (state == null || !state.hasCurrentTrack()) {
-            ctx.replyEphemeral("Сейчас ничего не воспроизводится.");
-            return;
-        }
 
         long requestedPage = ctx.getOption(PAGE).orElse(1L);
         if (requestedPage < 1) {
@@ -34,7 +29,19 @@ public class PlayerQueueCommandExecutor implements SlashExecutor {
             return;
         }
 
-        List<Track> queuedTracks = List.copyOf(state.getQueue());
+        Optional<PlayerQueueSnapshot> snapshotOptional = playerManager.getQueueSnapshot(guildId);
+        if (snapshotOptional.isEmpty()) {
+            ctx.replyEphemeral("Сейчас ничего не воспроизводится.");
+            return;
+        }
+
+        PlayerQueueSnapshot snapshot = snapshotOptional.get();
+        if (snapshot.getCurrentTrack() == null) {
+            ctx.replyEphemeral("Сейчас ничего не воспроизводится.");
+            return;
+        }
+
+        List<Track> queuedTracks = snapshot.getQueue();
         int totalTracks = queuedTracks.size();
         int totalPages = Math.max(1, (int) Math.ceil(totalTracks / (double) PAGE_SIZE));
         int page = (int) Math.min(requestedPage, totalPages);
@@ -45,14 +52,17 @@ public class PlayerQueueCommandExecutor implements SlashExecutor {
         StringBuilder message = new StringBuilder();
         message.append("🎶 **Очередь проигрывателя**\n");
         message.append("Сейчас играет: **")
-                .append(trackTitle(state.getCurrentTrack()))
+                .append(trackTitle(snapshot.getCurrentTrack()))
                 .append("**");
 
-        if (state.isPaused()) {
+        if (snapshot.isPaused()) {
             message.append(" *(на паузе)*");
         }
 
         message.append("\n");
+        message.append("Громкость: **")
+                .append(snapshot.getVolume())
+                .append("**\n");
         message.append("Треков в очереди: **")
                 .append(totalTracks)
                 .append("**\n");
@@ -65,7 +75,7 @@ public class PlayerQueueCommandExecutor implements SlashExecutor {
 
         message.append("Страница **")
                 .append(page)
-                .append('/')
+                .append("/")
                 .append(totalPages)
                 .append("**\n\n");
 
@@ -74,7 +84,19 @@ public class PlayerQueueCommandExecutor implements SlashExecutor {
             message.append(i + 1)
                     .append(". **")
                     .append(trackTitle(track))
-                    .append("**\n");
+                    .append("**");
+
+            String author = trackAuthor(track);
+            if (author != null && !author.isBlank()) {
+                message.append(" — ").append(author);
+            }
+
+            String duration = trackDuration(track);
+            if (duration != null) {
+                message.append(" `").append(duration).append("`");
+            }
+
+            message.append("\n");
         }
 
         ctx.reply(message.toString().trim());
@@ -85,5 +107,34 @@ public class PlayerQueueCommandExecutor implements SlashExecutor {
             return "unknown track";
         }
         return track.getInfo().getTitle();
+    }
+
+    protected String trackAuthor(Track track) {
+        if (track == null || track.getInfo() == null) {
+            return null;
+        }
+        return track.getInfo().getAuthor();
+    }
+
+    protected String trackDuration(Track track) {
+        if (track == null || track.getInfo() == null) {
+            return null;
+        }
+
+        long length = track.getInfo().getLength();
+        if (length <= 0) {
+            return null;
+        }
+
+        long totalSeconds = length / 1000L;
+        long hours = totalSeconds / 3600L;
+        long minutes = (totalSeconds % 3600L) / 60L;
+        long seconds = totalSeconds % 60L;
+
+        if (hours > 0) {
+            return String.format("%d:%02d:%02d", hours, minutes, seconds);
+        }
+
+        return String.format("%d:%02d", minutes, seconds);
     }
 }
