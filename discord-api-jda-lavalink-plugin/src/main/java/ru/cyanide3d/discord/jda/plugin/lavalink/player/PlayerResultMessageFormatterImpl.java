@@ -9,8 +9,12 @@ public class PlayerResultMessageFormatterImpl implements PlayerResultMessageForm
             return "Неизвестный результат.";
         }
 
-        if (!result.isSuccess()) {
+        if (result.isFailure()) {
             return formatFailure(result);
+        }
+
+        if (result.isNoop()) {
+            return formatNoop(result);
         }
 
         if (result instanceof PlayerPlayResult playResult) {
@@ -25,6 +29,7 @@ public class PlayerResultMessageFormatterImpl implements PlayerResultMessageForm
             case SEEKED -> "⏩ Позиция изменена.";
             case VOLUME_CHANGED -> "🔊 Громкость изменена.";
             case QUEUE_CLEARED -> "🧹 Очередь очищена.";
+            case FORGET -> "🗑 Состояние плеера сброшено.";
             default -> "Операция выполнена.";
         };
     }
@@ -50,7 +55,26 @@ public class PlayerResultMessageFormatterImpl implements PlayerResultMessageForm
 
         return switch (errorCode) {
             case "TRACK_NOT_FOUND" -> "Ничего не найдено.";
+            case "LOAD_FAILED" -> "Не удалось загрузить трек из Lavalink.";
+            case "INVALID_POSITION" -> "Позиция должна быть больше или равна 0.";
             default -> "Не удалось выполнить действие плеера.";
+        };
+    }
+
+    protected String formatNoop(PlayerActionResult result) {
+        String errorCode = result.getErrorCode();
+        if (errorCode == null) {
+            return "Ничего не изменилось.";
+        }
+
+        return switch (errorCode) {
+            case "NO_ACTIVE_TRACK" -> "Сейчас ничего не воспроизводится.";
+            case "ALREADY_PAUSED" -> "Плеер уже стоит на паузе.";
+            case "ALREADY_RESUMED" -> "Плеер и так не на паузе.";
+            case "ALREADY_STOPPED" -> "Плеер уже остановлен.";
+            case "QUEUE_ALREADY_EMPTY" -> "Очередь уже пуста.";
+            case "VOLUME_UNCHANGED" -> "Громкость уже установлена в это значение.";
+            default -> "Ничего не изменилось.";
         };
     }
 

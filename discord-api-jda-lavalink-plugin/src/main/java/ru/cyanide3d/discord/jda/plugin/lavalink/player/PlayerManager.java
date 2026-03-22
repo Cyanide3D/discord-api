@@ -1,5 +1,7 @@
 package ru.cyanide3d.discord.jda.plugin.lavalink.player;
 
+import java.util.Optional;
+
 public interface PlayerManager {
 
     PlayerPlayResult play(long guildId, TrackIdentifier identifier);
@@ -21,4 +23,6 @@ public interface PlayerManager {
     PlayerActionResult playNextIfAvailable(long guildId);
 
     PlayerActionResult forget(long guildId);
+
+    Optional<PlayerQueueSnapshot> getQueueSnapshot(long guildId);
 }

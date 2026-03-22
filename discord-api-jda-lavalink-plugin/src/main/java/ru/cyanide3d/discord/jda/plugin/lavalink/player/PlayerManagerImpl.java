@@ -9,7 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static ru.cyanide3d.discord.jda.plugin.lavalink.ReactorUtils.awaitVoid;
 
@@ -25,9 +29,79 @@ public class PlayerManagerImpl implements PlayerManager {
     @Autowired
     private TrackResolver trackResolver;
 
+    private final ConcurrentHashMap<Long, ReentrantLock> guildLocks = new ConcurrentHashMap<>();
+
     @Override
     public PlayerPlayResult play(long guildId, TrackIdentifier identifier) {
-        TrackLoadResult loadResult = trackResolver.resolve(identifier, guildId);
+        return withGuildLock(guildId, () -> doPlay(guildId, identifier));
+    }
+
+    @Override
+    public PlayerActionResult pause(long guildId) {
+        return withGuildLock(guildId, () -> doPause(guildId));
+    }
+
+    @Override
+    public PlayerActionResult resume(long guildId) {
+        return withGuildLock(guildId, () -> doResume(guildId));
+    }
+
+    @Override
+    public PlayerActionResult stop(long guildId) {
+        return withGuildLock(guildId, () -> doStop(guildId));
+    }
+
+    @Override
+    public PlayerActionResult skip(long guildId) {
+        return withGuildLock(guildId, () -> doSkip(guildId));
+    }
+
+    @Override
+    public PlayerActionResult seek(long guildId, long positionMs) {
+        return withGuildLock(guildId, () -> doSeek(guildId, positionMs));
+    }
+
+    @Override
+    public PlayerActionResult setVolume(long guildId, int volume) {
+        return withGuildLock(guildId, () -> doSetVolume(guildId, volume));
+    }
+
+    @Override
+    public PlayerActionResult clearQueue(long guildId) {
+        return withGuildLock(guildId, () -> doClearQueue(guildId));
+    }
+
+    @Override
+    public PlayerActionResult playNextIfAvailable(long guildId) {
+        return withGuildLock(guildId, () -> doPlayNextIfAvailable(guildId));
+    }
+
+    @Override
+    public PlayerActionResult forget(long guildId) {
+        return withGuildLock(guildId, () -> doForget(guildId));
+    }
+
+    @Override
+    public Optional<PlayerQueueSnapshot> getQueueSnapshot(long guildId) {
+        return withGuildLock(guildId, () -> {
+            GuildPlayerState state = guildPlayerRegistry.get(guildId);
+            if (state == null) {
+                return Optional.empty();
+            }
+
+            return Optional.of(new PlayerQueueSnapshot(state.getCurrentTrack(), state.queueSnapshot(), state.isPaused(), state.getVolume()));
+        });
+    }
+
+    protected PlayerPlayResult doPlay(long guildId, TrackIdentifier identifier) {
+        final TrackLoadResult loadResult;
+        try {
+            loadResult = trackResolver.resolve(identifier, guildId);
+        } catch (Exception e) {
+            log.warn("Failed to resolve track for guildId={}, source={}", guildId, identifier.sourceName(), e);
+            return PlayerPlayResult.failed("LOAD_FAILED");
+        }
+
         if (loadResult.isEmpty()) {
             return PlayerPlayResult.notFound();
         }
@@ -49,11 +123,14 @@ public class PlayerManagerImpl implements PlayerManager {
         return PlayerPlayResult.enqueued(first, state.queueSize());
     }
 
-    @Override
-    public PlayerActionResult pause(long guildId) {
+    protected PlayerActionResult doPause(long guildId) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
         if (state == null || !state.hasCurrentTrack()) {
-            return PlayerActionResult.success(PlayerActionType.PAUSED);
+            return PlayerActionResult.noop(PlayerActionType.PAUSED, "NO_ACTIVE_TRACK");
+        }
+
+        if (state.isPaused()) {
+            return PlayerActionResult.noop(PlayerActionType.PAUSED, "ALREADY_PAUSED");
         }
 
         updatePlayerSafely(guildId, player -> player.setPaused(true), "pause");
@@ -62,11 +139,14 @@ public class PlayerManagerImpl implements PlayerManager {
         return PlayerActionResult.success(PlayerActionType.PAUSED);
     }
 
-    @Override
-    public PlayerActionResult resume(long guildId) {
+    protected PlayerActionResult doResume(long guildId) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
         if (state == null || !state.hasCurrentTrack()) {
-            return PlayerActionResult.success(PlayerActionType.RESUMED);
+            return PlayerActionResult.noop(PlayerActionType.RESUMED, "NO_ACTIVE_TRACK");
+        }
+
+        if (!state.isPaused()) {
+            return PlayerActionResult.noop(PlayerActionType.RESUMED, "ALREADY_RESUMED");
         }
 
         updatePlayerSafely(guildId, player -> player.setPaused(false), "resume");
@@ -75,11 +155,10 @@ public class PlayerManagerImpl implements PlayerManager {
         return PlayerActionResult.success(PlayerActionType.RESUMED);
     }
 
-    @Override
-    public PlayerActionResult stop(long guildId) {
+    protected PlayerActionResult doStop(long guildId) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
-        if (state == null) {
-            return PlayerActionResult.success(PlayerActionType.STOPPED);
+        if (state == null || (!state.hasCurrentTrack() && state.isQueueEmpty())) {
+            return PlayerActionResult.noop(PlayerActionType.STOPPED, "ALREADY_STOPPED");
         }
 
         stopRemoteTrack(guildId);
@@ -89,11 +168,10 @@ public class PlayerManagerImpl implements PlayerManager {
         return PlayerActionResult.success(PlayerActionType.STOPPED);
     }
 
-    @Override
-    public PlayerActionResult skip(long guildId) {
+    protected PlayerActionResult doSkip(long guildId) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
-        if (state == null) {
-            return PlayerActionResult.success(PlayerActionType.SKIPPED);
+        if (state == null || (!state.hasCurrentTrack() && state.isQueueEmpty())) {
+            return PlayerActionResult.noop(PlayerActionType.SKIPPED, "NO_ACTIVE_TRACK");
         }
 
         Track next = state.pollNext();
@@ -110,26 +188,31 @@ public class PlayerManagerImpl implements PlayerManager {
         return PlayerActionResult.success(PlayerActionType.SKIPPED);
     }
 
-    @Override
-    public PlayerActionResult seek(long guildId, long positionMs) {
+    protected PlayerActionResult doSeek(long guildId, long positionMs) {
+        if (positionMs < 0) {
+            return PlayerActionResult.failure(PlayerActionType.SEEKED, "INVALID_POSITION");
+        }
+
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
         if (state == null || !state.hasCurrentTrack()) {
-            return PlayerActionResult.success(PlayerActionType.SEEKED);
+            return PlayerActionResult.noop(PlayerActionType.SEEKED, "NO_ACTIVE_TRACK");
         }
 
         updatePlayerSafely(guildId, player -> player.setPosition(positionMs), "seek");
-
         return PlayerActionResult.success(PlayerActionType.SEEKED);
     }
 
-    @Override
-    public PlayerActionResult setVolume(long guildId, int volume) {
+    protected PlayerActionResult doSetVolume(long guildId, int volume) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
-        if (state == null) {
-            return PlayerActionResult.success(PlayerActionType.VOLUME_CHANGED);
+        if (state == null || !state.hasCurrentTrack()) {
+            return PlayerActionResult.noop(PlayerActionType.VOLUME_CHANGED, "NO_ACTIVE_TRACK");
         }
 
         int normalized = Math.max(0, Math.min(1000, volume));
+
+        if (state.getVolume() == normalized) {
+            return PlayerActionResult.noop(PlayerActionType.VOLUME_CHANGED, "VOLUME_UNCHANGED");
+        }
 
         updatePlayerSafely(guildId, player -> player.setVolume(normalized), "set volume");
         state.setVolume(normalized);
@@ -137,27 +220,30 @@ public class PlayerManagerImpl implements PlayerManager {
         return PlayerActionResult.success(PlayerActionType.VOLUME_CHANGED);
     }
 
-    @Override
-    public PlayerActionResult clearQueue(long guildId) {
+    protected PlayerActionResult doClearQueue(long guildId) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
-        if (state == null) {
-            return PlayerActionResult.success(PlayerActionType.QUEUE_CLEARED);
+        if (state == null || state.isQueueEmpty()) {
+            return PlayerActionResult.noop(PlayerActionType.QUEUE_CLEARED, "QUEUE_ALREADY_EMPTY");
         }
 
         state.clearQueue();
         return PlayerActionResult.success(PlayerActionType.QUEUE_CLEARED);
     }
 
-    @Override
-    public PlayerActionResult playNextIfAvailable(long guildId) {
+    protected PlayerActionResult doPlayNextIfAvailable(long guildId) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
         if (state == null) {
-            return PlayerActionResult.success(PlayerActionType.SKIPPED);
+            return PlayerActionResult.noop(PlayerActionType.SKIPPED, "NO_ACTIVE_TRACK");
         }
 
         Track next = state.pollNext();
 
         if (next == null) {
+            if (!state.hasCurrentTrack()) {
+                guildPlayerRegistry.remove(guildId);
+                return PlayerActionResult.noop(PlayerActionType.SKIPPED, "NO_ACTIVE_TRACK");
+            }
+
             stopRemoteTrack(guildId);
             resetLocalState(state);
             guildPlayerRegistry.remove(guildId);
@@ -168,8 +254,7 @@ public class PlayerManagerImpl implements PlayerManager {
         return PlayerActionResult.success(PlayerActionType.SKIPPED);
     }
 
-    @Override
-    public PlayerActionResult forget(long guildId) {
+    protected PlayerActionResult doForget(long guildId) {
         GuildPlayerState state = guildPlayerRegistry.get(guildId);
 
         if (state != null) {
@@ -206,7 +291,10 @@ public class PlayerManagerImpl implements PlayerManager {
 
     protected void startTrackNow(long guildId, GuildPlayerState state, Track track) {
         Link link = lavalinkClient.getOrCreateLink(guildId);
-        awaitVoid(link.updatePlayer(player -> player.updateTrack(new TrackUpdateBuilder().setEncoded(track.getEncoded()).build())), guildId, "startTrackNow");
+
+        awaitVoid(link.updatePlayer(player -> player.updateTrack(new TrackUpdateBuilder()
+                                        .setEncoded(track.getEncoded())
+                                        .build())), guildId, "start track");
 
         state.setCurrentTrack(track);
         state.setPaused(false);
@@ -226,7 +314,7 @@ public class PlayerManagerImpl implements PlayerManager {
             return;
         }
 
-        awaitVoid(link.destroy(), guildId, "destroy_player");
+        awaitVoid(link.destroy(), guildId, "destroy link");
     }
 
     protected void resetLocalState(GuildPlayerState state) {
@@ -243,4 +331,14 @@ public class PlayerManagerImpl implements PlayerManager {
         }
     }
 
+    protected <T> T withGuildLock(long guildId, Supplier<T> action) {
+        ReentrantLock lock = guildLocks.computeIfAbsent(guildId, id -> new ReentrantLock());
+
+        lock.lock();
+        try {
+            return action.get();
+        } finally {
+            lock.unlock();
+        }
+    }
 }
