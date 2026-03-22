@@ -1,6 +1,7 @@
 package ru.cyanide3d.discord.jda.command.configuration;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.cyanide3d.discord.jda.api.command.SlashCommandCompiler;
@@ -14,6 +15,7 @@ import ru.cyanide3d.discord.jda.command.SlashCommandDiscordJDAEventListenerAdapt
 import ru.cyanide3d.discord.jda.command.SlashCommandDispatcherImpl;
 import ru.cyanide3d.discord.jda.command.SlashCommandRegistryImpl;
 import ru.cyanide3d.discord.jda.command.SpringSlashExecutorResolver;
+import ru.cyanide3d.discord.jda.command.properties.DiscordJDASlashCommandProperties;
 
 @Configuration
 public class DiscordJDASlashCommandConfiguration {
@@ -21,6 +23,12 @@ public class DiscordJDASlashCommandConfiguration {
     @Bean
     public SlashCommandDiscordJDAEventListenerAdapter slashCommandDiscordJDAEventListenerAdapter() {
         return new SlashCommandDiscordJDAEventListenerAdapter();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "discord.jda.command")
+    public DiscordJDASlashCommandProperties discordJDASlashCommandProperties() {
+        return new DiscordJDASlashCommandProperties();
     }
 
     @Bean
