@@ -11,6 +11,15 @@ public interface SlashCommandContext extends InteractionEventContext<SlashComman
 
     SlashCommandOptions getOptions();
 
+    default <T> Optional<T> getSlashValue(ContextValueReader<SlashCommandContext, T> reader) {
+        return reader.read(this);
+    }
+
+    default <T> T requireSlashValue(ContextValueReader<SlashCommandContext, T> reader) {
+        return reader.read(this).orElseThrow(() ->
+                new IllegalStateException("Value not found for reader: " + reader.getClass().getSimpleName()));
+    }
+
     default <T> Optional<T> getOption(SlashOptionReader<T> option) {
         return getOptions().get(option);
     }
@@ -22,6 +31,5 @@ public interface SlashCommandContext extends InteractionEventContext<SlashComman
     default boolean hasOption(SlashOptionReader<?> option) {
         return getOptions().has(option);
     }
-
 
 }

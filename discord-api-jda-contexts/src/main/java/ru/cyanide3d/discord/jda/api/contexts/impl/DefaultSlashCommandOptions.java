@@ -5,29 +5,45 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ru.cyanide3d.discord.jda.api.contexts.SlashCommandOptions;
 import ru.cyanide3d.discord.jda.api.contexts.SlashOptionReader;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class DefaultSlashCommandOptions implements SlashCommandOptions {
 
-    private final Map<String, SlashOptionReader<?>> declared;
+    private final Map<String, SlashOptionReader<?>> declaredByName;
+
+    private final Set<SlashOptionReader<?>> declaredByIdentity;
 
     private final SlashCommandInteractionEvent event;
 
     public DefaultSlashCommandOptions(Iterable<? extends SlashOptionReader<?>> declaredOptions, SlashCommandInteractionEvent event) {
         this.event = event;
-        this.declared = new LinkedHashMap<>();
+        this.declaredByName = new LinkedHashMap<>();
+        this.declaredByIdentity = Collections.newSetFromMap(new IdentityHashMap<>());
+
         for (SlashOptionReader<?> option : declaredOptions) {
-            this.declared.put(option.getName(), option);
+            SlashOptionReader<?> previous = this.declaredByName.put(option.getName(), option);
+            if (previous != null && previous != option) {
+                throw new IllegalArgumentException("Duplicate declared option name: " + option.getName());
+            }
+
+            this.declaredByIdentity.add(option);
         }
     }
 
     @Override
     public <T> Optional<T> get(SlashOptionReader<T> option) {
-        SlashOptionReader<?> declaredOption = declared.get(option.getName());
+        SlashOptionReader<?> declaredOption = declaredByName.get(option.getName());
         if (declaredOption == null) {
             throw new IllegalArgumentException("Option not declared for this command: " + option.getName());
+        }
+
+        if (!declaredByIdentity.contains(option)) {
+            throw new IllegalArgumentException("Use the same declared option instance for '" + option.getName() + "'");
         }
 
         OptionMapping mapping = event.getOption(option.getName());
@@ -35,7 +51,7 @@ public class DefaultSlashCommandOptions implements SlashCommandOptions {
             return Optional.empty();
         }
 
-        return Optional.of(option.read(mapping));
+        return Optional.ofNullable(option.readOption(mapping));
     }
 
     @Override
@@ -46,7 +62,7 @@ public class DefaultSlashCommandOptions implements SlashCommandOptions {
 
     @Override
     public boolean has(SlashOptionReader<?> option) {
-        if (!declared.containsKey(option.getName())) {
+        if (!declaredByIdentity.contains(option)) {
             return false;
         }
         return event.getOption(option.getName()) != null;

@@ -69,7 +69,22 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
 
     private final Function<OptionMapping, T> reader;
 
-    private OptionSpec(OptionType type, String name, String description, boolean required, boolean autoComplete, List<ChoiceSpec> choices, Set<ChannelType> channelTypes, Number minValue, Number maxValue, Integer minLength, Integer maxLength, Map<DiscordLocale, String> nameLocalizations, Map<DiscordLocale, String> descriptionLocalizations, Function<OptionMapping, T> reader) {
+    private OptionSpec(
+            OptionType type,
+            String name,
+            String description,
+            boolean required,
+            boolean autoComplete,
+            List<ChoiceSpec> choices,
+            Set<ChannelType> channelTypes,
+            Number minValue,
+            Number maxValue,
+            Integer minLength,
+            Integer maxLength,
+            Map<DiscordLocale, String> nameLocalizations,
+            Map<DiscordLocale, String> descriptionLocalizations,
+            Function<OptionMapping, T> reader
+    ) {
         this.type = Objects.requireNonNull(type, "type");
         this.name = Objects.requireNonNull(name, "name");
         this.description = Objects.requireNonNull(description, "description");
@@ -153,7 +168,22 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     public <R> OptionSpec<R> map(Function<? super T, ? extends R> mapper) {
         Objects.requireNonNull(mapper, "mapper");
 
-        return new OptionSpec<>(type, name, description, required, autoComplete, choices, channelTypes, minValue, maxValue, minLength, maxLength, nameLocalizations, descriptionLocalizations, mapping -> mapper.apply(reader.apply(mapping)));
+        return new OptionSpec<>(
+                type,
+                name,
+                description,
+                required,
+                autoComplete,
+                choices,
+                channelTypes,
+                minValue,
+                maxValue,
+                minLength,
+                maxLength,
+                nameLocalizations,
+                descriptionLocalizations,
+                mapping -> mapper.apply(reader.apply(mapping))
+        );
     }
 
     public OptionSpec<T> required() {
@@ -339,7 +369,7 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
     }
 
     @Override
-    public T read(OptionMapping mapping) {
+    public T readOption(OptionMapping mapping) {
         return reader.apply(mapping);
     }
 
