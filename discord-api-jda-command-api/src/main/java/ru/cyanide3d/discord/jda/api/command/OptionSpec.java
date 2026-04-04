@@ -41,6 +41,16 @@ public final class OptionSpec<T> implements SlashOptionReader<T> {
             OptionType.NUMBER
     );
 
+    @Override
+    public boolean isCompatibleWith(SlashOptionReader<?> other) {
+        if (!(other instanceof OptionSpec<?>)) {
+            return false;
+        }
+
+        OptionSpec<?> another = (OptionSpec<?>) other;
+        return Objects.equals(name, another.name) && type == another.type;
+    }
+
     private final OptionType type;
 
     private final String name;

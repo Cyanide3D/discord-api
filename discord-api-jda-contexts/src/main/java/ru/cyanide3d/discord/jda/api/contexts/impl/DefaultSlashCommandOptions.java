@@ -5,46 +5,32 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ru.cyanide3d.discord.jda.api.contexts.SlashCommandOptions;
 import ru.cyanide3d.discord.jda.api.contexts.SlashOptionReader;
 
-import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 public class DefaultSlashCommandOptions implements SlashCommandOptions {
 
     private final Map<String, SlashOptionReader<?>> declaredByName;
 
-    private final Set<SlashOptionReader<?>> declaredByIdentity;
-
     private final SlashCommandInteractionEvent event;
 
     public DefaultSlashCommandOptions(Iterable<? extends SlashOptionReader<?>> declaredOptions, SlashCommandInteractionEvent event) {
-        this.event = event;
+        this.event = Objects.requireNonNull(event, "event");
         this.declaredByName = new LinkedHashMap<>();
-        this.declaredByIdentity = Collections.newSetFromMap(new IdentityHashMap<>());
 
         for (SlashOptionReader<?> option : declaredOptions) {
             SlashOptionReader<?> previous = this.declaredByName.put(option.getName(), option);
-            if (previous != null && previous != option) {
-                throw new IllegalArgumentException("Duplicate declared option name: " + option.getName());
+            if (previous != null && !previous.isCompatibleWith(option)) {
+                throw new IllegalArgumentException("Duplicate declared option name with incompatible reader: " + option.getName());
             }
-
-            this.declaredByIdentity.add(option);
         }
     }
 
     @Override
     public <T> Optional<T> get(SlashOptionReader<T> option) {
-        SlashOptionReader<?> declaredOption = declaredByName.get(option.getName());
-        if (declaredOption == null) {
-            throw new IllegalArgumentException("Option not declared for this command: " + option.getName());
-        }
-
-        if (!declaredByIdentity.contains(option)) {
-            throw new IllegalArgumentException("Use the same declared option instance for '" + option.getName() + "'");
-        }
+        requireCompatibleOption(option);
 
         OptionMapping mapping = event.getOption(option.getName());
         if (mapping == null) {
@@ -62,9 +48,26 @@ public class DefaultSlashCommandOptions implements SlashCommandOptions {
 
     @Override
     public boolean has(SlashOptionReader<?> option) {
-        if (!declaredByIdentity.contains(option)) {
+        try {
+            requireCompatibleOption(option);
+            return event.getOption(option.getName()) != null;
+        } catch (IllegalArgumentException e) {
             return false;
         }
-        return event.getOption(option.getName()) != null;
+    }
+
+    private void requireCompatibleOption(SlashOptionReader<?> option) {
+        SlashOptionReader<?> declaredOption = declaredByName.get(option.getName());
+        if (declaredOption == null) {
+            throw new IllegalArgumentException("Option not declared for this command: " + option.getName());
+        }
+
+        if (!declaredOption.isCompatibleWith(option) || !option.isCompatibleWith(declaredOption)) {
+            throw new IllegalArgumentException(
+                    "Incompatible option reader for '" + option.getName() + "'. Declared="
+                            + declaredOption.getClass().getName()
+                            + ", actual=" + option.getClass().getName()
+            );
+        }
     }
 }
