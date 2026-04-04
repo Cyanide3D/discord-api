@@ -7,10 +7,10 @@ import dev.arbjerg.lavalink.client.player.PlaylistLoaded;
 import dev.arbjerg.lavalink.client.player.SearchResult;
 import dev.arbjerg.lavalink.client.player.TrackLoaded;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.cyanide3d.discord.jda.plugin.lavalink.ReactorUtils;
 
 import java.util.Collections;
-
-import static ru.cyanide3d.discord.jda.plugin.lavalink.ReactorUtils.await;
+import java.util.concurrent.CompletableFuture;
 
 public class TrackResolverImpl implements TrackResolver {
 
@@ -18,10 +18,14 @@ public class TrackResolverImpl implements TrackResolver {
     private LavalinkClient lavalinkClient;
 
     @Override
-    public TrackLoadResult resolve(TrackIdentifier identifier, long guildId) {
+    public CompletableFuture<TrackLoadResult> resolveAsync(TrackIdentifier identifier, long guildId) {
         Link link = lavalinkClient.getOrCreateLink(guildId);
 
-        LavalinkLoadResult result = await(link.loadItem(identifier.buildStringIdentifier()), guildId, "resolve_Track");
+        return ReactorUtils.toFuture(link.loadItem(identifier.buildStringIdentifier()), guildId, "resolve_track")
+                .thenApply(result -> mapResult(result, identifier));
+    }
+
+    private TrackLoadResult mapResult(LavalinkLoadResult result, TrackIdentifier identifier) {
         if (result == null) {
             return TrackLoadResult.of(Collections.emptyList(), false, identifier.sourceName());
         }

@@ -7,10 +7,13 @@ import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.client.player.TrackUpdateBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -29,67 +32,76 @@ public class PlayerManagerImpl implements PlayerManager {
     @Autowired
     private TrackResolver trackResolver;
 
+    @Autowired
+    @Qualifier("lavalinkExecutor")
+    private Executor lavalinkExecutor;
+
     private final ConcurrentHashMap<Long, ReentrantLock> guildLocks = new ConcurrentHashMap<>();
 
     @Override
-    public PlayerPlayResult play(long guildId, TrackIdentifier identifier) {
-        return withGuildLock(guildId, () -> doPlay(guildId, identifier));
+    public CompletableFuture<PlayerPlayResult> playAsync(long guildId, TrackIdentifier identifier) {
+        return supplyLocked(guildId, () -> doPlay(guildId, identifier));
     }
 
     @Override
-    public PlayerActionResult pause(long guildId) {
-        return withGuildLock(guildId, () -> doPause(guildId));
+    public CompletableFuture<PlayerActionResult> pauseAsync(long guildId) {
+        return supplyLocked(guildId, () -> doPause(guildId));
     }
 
     @Override
-    public PlayerActionResult resume(long guildId) {
-        return withGuildLock(guildId, () -> doResume(guildId));
+    public CompletableFuture<PlayerActionResult> resumeAsync(long guildId) {
+        return supplyLocked(guildId, () -> doResume(guildId));
     }
 
     @Override
-    public PlayerActionResult stop(long guildId) {
-        return withGuildLock(guildId, () -> doStop(guildId));
+    public CompletableFuture<PlayerActionResult> stopAsync(long guildId) {
+        return supplyLocked(guildId, () -> doStop(guildId));
     }
 
     @Override
-    public PlayerActionResult skip(long guildId) {
-        return withGuildLock(guildId, () -> doSkip(guildId));
+    public CompletableFuture<PlayerActionResult> skipAsync(long guildId) {
+        return supplyLocked(guildId, () -> doSkip(guildId));
     }
 
     @Override
-    public PlayerActionResult seek(long guildId, long positionMs) {
-        return withGuildLock(guildId, () -> doSeek(guildId, positionMs));
+    public CompletableFuture<PlayerActionResult> seekAsync(long guildId, long positionMs) {
+        return supplyLocked(guildId, () -> doSeek(guildId, positionMs));
     }
 
     @Override
-    public PlayerActionResult setVolume(long guildId, int volume) {
-        return withGuildLock(guildId, () -> doSetVolume(guildId, volume));
+    public CompletableFuture<PlayerActionResult> setVolumeAsync(long guildId, int volume) {
+        return supplyLocked(guildId, () -> doSetVolume(guildId, volume));
     }
 
     @Override
-    public PlayerActionResult clearQueue(long guildId) {
-        return withGuildLock(guildId, () -> doClearQueue(guildId));
+    public CompletableFuture<PlayerActionResult> clearQueueAsync(long guildId) {
+        return supplyLocked(guildId, () -> doClearQueue(guildId));
     }
 
     @Override
-    public PlayerActionResult playNextIfAvailable(long guildId) {
-        return withGuildLock(guildId, () -> doPlayNextIfAvailable(guildId));
+    public CompletableFuture<PlayerActionResult> playNextIfAvailableAsync(long guildId) {
+        return supplyLocked(guildId, () -> doPlayNextIfAvailable(guildId));
     }
 
     @Override
-    public PlayerActionResult forget(long guildId) {
-        return withGuildLock(guildId, () -> doForget(guildId));
+    public CompletableFuture<PlayerActionResult> forgetAsync(long guildId) {
+        return supplyLocked(guildId, () -> doForget(guildId));
     }
 
     @Override
-    public Optional<PlayerQueueSnapshot> getQueueSnapshot(long guildId) {
-        return withGuildLock(guildId, () -> {
+    public CompletableFuture<Optional<PlayerQueueSnapshot>> getQueueSnapshotAsync(long guildId) {
+        return supplyLocked(guildId, () -> {
             GuildPlayerState state = guildPlayerRegistry.get(guildId);
             if (state == null) {
                 return Optional.empty();
             }
 
-            return Optional.of(new PlayerQueueSnapshot(state.getCurrentTrack(), state.queueSnapshot(), state.isPaused(), state.getVolume()));
+            return Optional.of(new PlayerQueueSnapshot(
+                    state.getCurrentTrack(),
+                    state.queueSnapshot(),
+                    state.isPaused(),
+                    state.getVolume()
+            ));
         });
     }
 
@@ -293,8 +305,8 @@ public class PlayerManagerImpl implements PlayerManager {
         Link link = lavalinkClient.getOrCreateLink(guildId);
 
         awaitVoid(link.updatePlayer(player -> player.updateTrack(new TrackUpdateBuilder()
-                                        .setEncoded(track.getEncoded())
-                                        .build())), guildId, "start track");
+                .setEncoded(track.getEncoded())
+                .build())), guildId, "start track");
 
         state.setCurrentTrack(track);
         state.setPaused(false);
@@ -329,6 +341,10 @@ public class PlayerManagerImpl implements PlayerManager {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to " + action + " for guildId=" + guildId, e);
         }
+    }
+
+    protected <T> CompletableFuture<T> supplyLocked(long guildId, Supplier<T> action) {
+        return CompletableFuture.supplyAsync(() -> withGuildLock(guildId, action), lavalinkExecutor);
     }
 
     protected <T> T withGuildLock(long guildId, Supplier<T> action) {

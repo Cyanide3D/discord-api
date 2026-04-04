@@ -35,6 +35,9 @@ import ru.cyanide3d.discord.jda.plugin.lavalink.player.TrackResolverImpl;
 import ru.cyanide3d.discord.jda.plugin.lavalink.property.DiscordJDALavalinkProperties;
 import ru.cyanide3d.discord.jda.plugin.lavalink.property.DiscordJDALavalinkPropertiesImpl;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @AutoConfiguration
 public class DiscordJDALavalinkAutoConfiguration {
 
@@ -58,6 +61,12 @@ public class DiscordJDALavalinkAutoConfiguration {
     @ConfigurationProperties(prefix = "discord.jda.lavalink")
     public DiscordJDALavalinkProperties discordJDALavalinkProperties() {
         return new DiscordJDALavalinkPropertiesImpl();
+    }
+
+    @Bean(name = "lavalinkExecutor", destroyMethod = "shutdown")
+    @ConditionalOnMissingBean(name = "lavalinkExecutor")
+    public ExecutorService lavalinkExecutor() {
+        return Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors() / 2));
     }
 
     @Bean
