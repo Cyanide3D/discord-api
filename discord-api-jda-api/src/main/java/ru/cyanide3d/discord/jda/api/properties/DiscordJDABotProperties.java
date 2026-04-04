@@ -21,6 +21,10 @@ public interface DiscordJDABotProperties {
 
     String getChunkingFilterMode();
 
+    DiscordJDABuilderMode getBuilderMode();
+
+    int getEventExecutorThreads();
+
     Collection<GatewayIntent> getGatewayIntents();
 
     Collection<CacheFlag> getDisabledCacheFlags();

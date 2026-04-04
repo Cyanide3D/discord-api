@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.springframework.validation.annotation.Validated;
 import ru.cyanide3d.discord.jda.api.properties.DiscordJDABotProperties;
+import ru.cyanide3d.discord.jda.api.properties.DiscordJDABuilderMode;
 import ru.cyanide3d.discord.jda.api.properties.DiscordJDAPresenceProperties;
 
 import java.util.ArrayList;
@@ -41,6 +42,13 @@ public class DiscordJDABotPropertiesImpl implements DiscordJDABotProperties {
 
     @Getter
     private String chunkingFilterMode = "NONE";
+
+    @Getter
+    private DiscordJDABuilderMode builderMode = DiscordJDABuilderMode.DEFAULT;
+
+    @Getter
+    @Min(value = 1, message = "discord.jda.event-executor-threads must be >= 1")
+    private int eventExecutorThreads = 8;
 
     private List<String> gatewayIntents = new ArrayList<>();
 
@@ -92,6 +100,4 @@ public class DiscordJDABotPropertiesImpl implements DiscordJDABotProperties {
     public Collection<String> getStringEnabledCacheFlags() {
         return enabledCacheFlags;
     }
-
-
 }

@@ -32,9 +32,16 @@ import java.util.concurrent.Executors;
 public class DiscordJDAAutoconfiguredBotAutoConfiguration {
 
     @Bean
+    @ConfigurationProperties(prefix = "discord.jda")
+    public DiscordJDABotProperties discordBotProperties() {
+        return new DiscordJDABotPropertiesImpl();
+    }
+
+    @Bean(name = "eventExecutor", destroyMethod = "shutdown")
     @Qualifier("eventExecutor")
-    public ExecutorService eventExecutorService() {
-        return Executors.newFixedThreadPool(8);
+    @ConditionalOnMissingBean(name = "eventExecutor")
+    public ExecutorService eventExecutorService(DiscordJDABotProperties properties) {
+        return Executors.newFixedThreadPool(properties.getEventExecutorThreads());
     }
 
     @Bean
@@ -47,12 +54,6 @@ public class DiscordJDAAutoconfiguredBotAutoConfiguration {
     @ConditionalOnMissingBean
     public TrackingChunkingFilter trackingChunkingFilter() {
         return new TrackingChunkingFilterImpl();
-    }
-
-    @Bean
-    @ConfigurationProperties(prefix = "discord.jda")
-    public DiscordJDABotProperties discordBotProperties() {
-        return new DiscordJDABotPropertiesImpl();
     }
 
     @Bean
